@@ -674,6 +674,11 @@ static void ALWAYS_INLINE b91_rf_rx_isr(const struct device *dev)
 			break;
 		}
 		if (frame.general.type == IEEE802154_FRAME_FCF_TYPE_ACK) {
+			if (IS_ENABLED(CONFIG_OPENTHREAD_MTD_SED)) 
+			{
+					if(frame.general.fp_bit==0)
+					rf_set_tx_rx_off();
+			}
 			if (b91->ack_handler_en) {
 #if defined(CONFIG_NET_PKT_TIMESTAMP) && defined(CONFIG_NET_PKT_TXTIME)
 				b91_handle_ack(dev, payload, length, rx_time);
@@ -922,8 +927,8 @@ static int b91_set_channel(const struct device *dev, uint16_t channel)
 		b91->current_channel = channel;
 		if (b91->is_started) {
 			rf_set_chn(B91_LOGIC_CHANNEL_TO_PHYSICAL(channel));
-			rf_set_txmode();
-			rf_set_rxmode();
+			// rf_set_txmode(); // RF power may become weak after wakes up. Need to investigate.
+			// rf_set_rxmode();
 		}
 	}
 
