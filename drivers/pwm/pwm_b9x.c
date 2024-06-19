@@ -25,11 +25,12 @@ struct pwm_b9x_data {
 /* API implementation: init */
 static int pwm_b9x_init(const struct device *dev)
 {
+#if 0
 	const struct pwm_b9x_config *config = dev->config;
 
 	uint32_t pwm_clk_div;
-// adopt with zigbee , use the initial div setting part .
-#if 0
+	// adopt with zigbee , use the initial div setting part .
+
 	/* Calculate and check PWM clock divider */
 	pwm_clk_div = sys_clk.pclk * 1000 * 1000 / config->clock_frequency - 1;
 	if (pwm_clk_div > 255) {
