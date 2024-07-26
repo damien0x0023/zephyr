@@ -223,6 +223,13 @@ static int soc_b9x_init(void)
 	clock_32k_init(CLK_32K_RC);
 	clock_cal_32k_rc();
 
+	/* Reset Radio */
+	rf_radio_reset();
+#if CONFIG_SOC_RISCV_TELINK_B91 || CONFIG_SOC_RISCV_TELINK_B92
+	rf_reset_dma();
+	rf_baseband_reset();
+#endif
+
 #if CONFIG_SOC_RISCV_TELINK_B92 || CONFIG_SOC_RISCV_TELINK_B95
 	/* Stop 32k watchdog */
 	wd_32k_stop();
