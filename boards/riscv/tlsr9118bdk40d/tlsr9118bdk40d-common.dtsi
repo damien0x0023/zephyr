@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2023 Telink Semiconductor
+ * Copyright (c) 2024 Telink Semiconductor
+ * Copyright (c) 2024 Telink Semiconductor (Shanghai) Co., Ltd.
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -20,6 +21,7 @@
 		sw1 = &key_2;
 		pwm-led0 = &pwm_led_red;
 		pwm-0 = &pwm0;
+		watchdog0 = &wdt;
 	};
 
 	leds {
@@ -57,8 +59,6 @@
 
 	chosen {
 /* Note: use RAM_DLM for ".ram_dlm" when a shared SRAM will be used for "zephyr,sram" */
-		zephyr,console = &uart2;
-		zephyr,shell-uart = &uart2;
 		zephyr,sram = &ram_dlm;
 		zephyr,flash = &flash;
 		zephyr,flash-controller = &flash_mspi;
@@ -84,23 +84,27 @@
 		};
 		slot0_partition: partition@20000 {
 			label = "image-0";
-			reg = <0x20000 0x68000>;
+			reg = <0x20000 0x120000>;
 		};
-		slot1_partition: partition@88000 {
+		n22_partition: partition@140000 { // Don't change n22_partition
+			label = "image-n22";
+			reg = <0x140000 0xc7000>;
+		};
+		slot1_partition: partition@207000 {
 			label = "image-1";
-			reg = <0x88000 0x68000>;
+			reg = <0x207000 0x120000>;
 		};
-		scratch_partition: partition@f0000 {
+		scratch_partition: partition@327000 {
 			label = "image-scratch";
-			reg = <0xf0000 0x4000>;
+			reg = <0x327000 0x4000>;
 		};
-		storage_partition: partition@f4000 {
+		storage_partition: partition@32b000 {
 			label = "storage";
-			reg = <0xf4000 0xa000>;
+			reg = <0x32b000 0xa000>;
 		};
-		vendor_partition: partition@fe000 {
+		vendor_partition: partition@3fe000 {
 			label = "vendor-data";
-			reg = <0xfe000 0x2000>;
+			reg = <0x3fe000 0x2000>;
 		};
 	};
 };
@@ -124,6 +128,12 @@
 	pinctrl-names = "default";
 };
 
+&spi1 {
+	status = "okay";
+	pinctrl-0 = <&spi1_cs_default &spi1_clk_default &spi1_miso_default &spi1_mosi_default>;
+	pinctrl-names = "default";
+};
+
 &pwm0 {
 	status = "okay";
 	pinctrl-ch4 = <&pwm_ch4_p20_default>;
@@ -134,4 +144,26 @@
 	current-speed = <115200>;
 	pinctrl-0 = <&uart2_tx_p16_default &uart2_rx_p15_default>;
 	pinctrl-names = "default";
+};
+
+&adc {
+	status = "okay";
+	pinctrl-0 = <&adc_ch0_p7_default>;
+	pinctrl-names = "default";
+
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	channel@0 {
+		reg = <0>;
+		zephyr,gain = "ADC_GAIN_1";
+		zephyr,reference = "ADC_REF_INTERNAL";
+		zephyr,acquisition-time = <ADC_ACQ_TIME_DEFAULT>;
+		zephyr,resolution = <12>;
+		zephyr,input-positive = <ADC_SINGLE_CH_5>;
+	};
+};
+
+&wdt {
+	status = "okay";
 };

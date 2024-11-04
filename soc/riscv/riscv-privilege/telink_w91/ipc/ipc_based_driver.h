@@ -20,12 +20,15 @@ enum ipc_dispatcher_id {
 	IPC_DISPATCHER_ENTROPY_TRNG             = 0x400,
 	IPC_DISPATCHER_PINCTRL                  = 0x500,
 	IPC_DISPATCHER_I2C                      = 0x600,
-	IPC_DISPATCHER_FLASH                    = 0x700,
-	IPC_DISPATCHER_BLE                      = 0x800,
-	IPC_DISPATCHER_WIFI                     = 0x900,
-	IPC_DISPATCHER_BLOCKING                 = 0xa00,
-	IPC_DISPATCHER_HEARTBEAT                = 0xb00,
-	IPC_DISPATCHER_CRYPTO_ECC               = 0xc00,
+	IPC_DISPATCHER_SPI                      = 0x700,
+	IPC_DISPATCHER_FLASH                    = 0x800,
+	IPC_DISPATCHER_BLE                      = 0x900,
+	IPC_DISPATCHER_WIFI                     = 0xa00,
+	IPC_DISPATCHER_BLOCKING                 = 0xb00,
+	IPC_DISPATCHER_HEARTBEAT                = 0xc00,
+	IPC_DISPATCHER_CRYPTO_ECC               = 0xd00,
+	IPC_DISPATCHER_WATCHDOG                 = 0xe00,
+	IPC_DISPATCHER_ADC                      = 0xf00,
 } __attribute__((__packed__));
 
 typedef void (*ipc_based_driver_unpack_t)(void *result, const uint8_t *data, size_t len);
@@ -124,7 +127,28 @@ do {                                                                           \
 		&ctx, timeout_ms);                                                     \
                                                                                \
 	if (ipc_err) {                                                             \
-		/* TODO: Add assert after IPv6 FreeRTOS implemented: assert(0); */     \
+		assert(0);                                                             \
+	}                                                                          \
+} while (0)
+
+#define IPC_DISPATCHER_HOST_SEND_DATA_BY_HEAP(ipc, inst, name,                 \
+	tx_buff, rx_buff, timeout_ms)                                              \
+do {                                                                           \
+	uint8_t *packed_data = malloc(pack_##name(inst, tx_buff, NULL));           \
+	assert(packed_data != NULL);                                               \
+                                                                               \
+	size_t packed_len = pack_##name(inst, tx_buff, packed_data);               \
+	struct ipc_based_driver_ctx ctx = {                                        \
+		.unpack = unpack_##name,                                               \
+		.result = rx_buff,                                                     \
+	};                                                                         \
+                                                                               \
+	int ipc_err = ipc_based_driver_send(ipc, packed_data, packed_len,          \
+		&ctx, timeout_ms);                                                     \
+                                                                               \
+	free(packed_data);                                                         \
+	if (ipc_err) {                                                             \
+		assert(0);                                                             \
 	}                                                                          \
 } while (0)
 

@@ -6,6 +6,8 @@
 
 /dts-v1/;
 
+#include <zephyr/dt-bindings/adc/adc.h>
+#include <zephyr/dt-bindings/adc/w91-adc.h>
 #include <zephyr/dt-bindings/gpio/gpio.h>
 #include <zephyr/dt-bindings/i2c/i2c.h>
 #include <zephyr/dt-bindings/pwm/pwm.h>
@@ -90,7 +92,7 @@
 
 			flash: flash@80000000 {
 				compatible = "soc-nv-flash";
-				reg = <0x80000000 0x300000>;
+				reg = <0x80000000 0x400000>;
 				write-block-size = <1>;
 			};
 		};
@@ -124,6 +126,22 @@
 		pinctrl: pinctrl{
 			compatible = "telink,w91-pinctrl";
 			status = "okay";
+		};
+
+		spi1: spi1 {
+			compatible = "telink,w91-spi";
+			instance-id = <1>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+			status = "disabled";
+		};
+
+		spi2: spi2 {
+			compatible = "telink,w91-spi";
+			instance-id = <2>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+			status = "disabled";
 		};
 
 		i2c0: i2c0 {
@@ -161,6 +179,16 @@
 			compatible = "telink,w91-uart";
 			instance-id = <2>;
 			status = "disabled";
+		};
+
+		wdt: watchdog {
+			compatible = "telink,w91-watchdog";
+			status = "disabled";
+		};
+		adc: adc {
+			compatible = "telink,w91-adc";
+			status = "disabled";
+			#io-channel-cells = <1>;
 		};
 	};
 };

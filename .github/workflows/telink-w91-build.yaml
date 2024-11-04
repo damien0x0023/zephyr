@@ -41,73 +41,92 @@ jobs:
     - name: Build W91 basic/blinky
       run: |
         cd ..
-        west build -b tlsr9118bdk40d             -d build_blinky_w91                    zephyr/samples/basic/blinky
+        west build -b tlsr9118bdk40d             -d build_blinky_w91                    zephyr/samples/basic/blinky                   -- -DCONFIG_COMPILER_WARNINGS_AS_ERRORS=y
 
     - name: Build W91 basic/button
       run: |
         cd ..
-        west build -b tlsr9118bdk40d             -d build_button_w91                    zephyr/samples/basic/button
+        west build -b tlsr9118bdk40d             -d build_button_w91                    zephyr/samples/basic/button                   -- -DCONFIG_COMPILER_WARNINGS_AS_ERRORS=y
 
     - name: Build W91 uart/echo_bot
       run: |
         cd ..
-        west build -b tlsr9118bdk40d             -d build_uart_echo_bot_w91             zephyr/samples/drivers/uart/echo_bot
+        west build -b tlsr9118bdk40d             -d build_uart_echo_bot_w91             zephyr/samples/drivers/uart/echo_bot          -- -DCONFIG_COMPILER_WARNINGS_AS_ERRORS=y
 
     - name: Build W91 I2C sensor/mpu6050
       run: |
         cd ..
-        west build -b tlsr9118bdk40d             -d build_mpu6050_w91                   zephyr/samples/sensor/mpu6050
+        west build -b tlsr9118bdk40d             -d build_mpu6050_w91                   zephyr/samples/sensor/mpu6050                 -- -DCONFIG_COMPILER_WARNINGS_AS_ERRORS=y
+
+    - name: Build W91 spi_flash_at45
+      run: |
+        cd ..
+        west build -b tlsr9118bdk40d             -d build_spi_flash_at45_w91            zephyr/samples/drivers/spi_flash_at45         -- -DCONFIG_COMPILER_WARNINGS_AS_ERRORS=y
 
     - name: Build W91 subsys/nvs
       run: |
         cd ..
-        west build -b tlsr9118bdk40d             -d build_nvs_w91                       zephyr/samples/subsys/nvs
+        west build -b tlsr9118bdk40d             -d build_nvs_w91                       zephyr/samples/subsys/nvs                     -- -DCONFIG_COMPILER_WARNINGS_AS_ERRORS=y
 
     - name: Build W91 bootloader/mcuboot/boot
       run: |
         cd ..
-        west build -b tlsr9118bdk40d             -d build_mcuboot_w91                   bootloader/mcuboot/boot/zephyr                           -- -DCONFIG_LOG_DEFAULT_LEVEL=3
+        west build -b tlsr9118bdk40d             -d build_mcuboot_w91                   bootloader/mcuboot/boot/zephyr                -- -DCONFIG_COMPILER_WARNINGS_AS_ERRORS=y    -DCONFIG_LOG_DEFAULT_LEVEL=3
 
     - name: Build W91 basic/blinky for DFU
       run: |
         cd ..
-        west build -b tlsr9118bdk40d             -d build_blinky_dfu_w91                zephyr/samples/basic/blinky                              -- -DCONFIG_BOOTLOADER_MCUBOOT=y
+        west build -b tlsr9118bdk40d             -d build_blinky_dfu_w91                zephyr/samples/basic/blinky                   -- -DCONFIG_COMPILER_WARNINGS_AS_ERRORS=y    -DCONFIG_BOOTLOADER_MCUBOOT=y
 
     - name: Build W91 bluetooth/peripheral_ht
       run: |
         cd ..
-        west build -b tlsr9118bdk40d             -d build_bt_peripheral_ht_w91          zephyr/samples/bluetooth/peripheral_ht
+        west build -b tlsr9118bdk40d             -d build_bt_peripheral_ht_w91          zephyr/samples/bluetooth/peripheral_ht        -- -DCONFIG_COMPILER_WARNINGS_AS_ERRORS=y
 
     - name: Build W91 sock_simple IPv4
       run: |
         cd ..
-        west build -b tlsr9118bdk40d             -d build_sock_simple_ipv4_w91          zephyr/samples/boards/tlsr9x/sock_simple
+        west build -b tlsr9118bdk40d             -d build_sock_simple_ipv4_w91          zephyr/samples/boards/tlsr9x/sock_simple      -- -DCONFIG_COMPILER_WARNINGS_AS_ERRORS=y
 
     - name: Build W91 sock_simple IPv6
       run: |
         cd ..
-        west build -b tlsr9118bdk40d             -d build_sock_simple_ipv6_w91          zephyr/samples/boards/tlsr9x/sock_simple                 -- -DCONFIG_APP_SOCKET_UDP_IPV6=y
+        west build -b tlsr9118bdk40d             -d build_sock_simple_ipv6_w91          zephyr/samples/boards/tlsr9x/sock_simple      -- -DCONFIG_COMPILER_WARNINGS_AS_ERRORS=y    -DCONFIG_APP_SOCKET_UDP_IPV6=y
 
     - name: Build W91 key_matrix
       run: |
         cd ..
-        west build -b tlsr9118bdk40d             -d build_key_matrix                    zephyr/samples/boards/tlsr9x/key_matrix
+        west build -b tlsr9118bdk40d             -d build_key_matrix                    zephyr/samples/boards/tlsr9x/key_matrix       -- -DCONFIG_COMPILER_WARNINGS_AS_ERRORS=y
 
     - name: Build W91 key_pool
       run: |
         cd ..
-        west build -b tlsr9118bdk40d             -d build_key_pool                      zephyr/samples/boards/tlsr9x/key_pool
+        west build -b tlsr9118bdk40d             -d build_key_pool                      zephyr/samples/boards/tlsr9x/key_pool         -- -DCONFIG_COMPILER_WARNINGS_AS_ERRORS=y
 
     - name: Build W91 led_pool
       run: |
         cd ..
-        west build -b tlsr9118bdk40d             -d build_led_pool                      zephyr/samples/boards/tlsr9x/led_pool/
+        west build -b tlsr9118bdk40d             -d build_led_pool                      zephyr/samples/boards/tlsr9x/led_pool/        -- -DCONFIG_COMPILER_WARNINGS_AS_ERRORS=y
 
     - name: Build W91 pwm_pool
       run: |
         cd ..
-        west build -b tlsr9118bdk40d             -d build_pwm_pool                      zephyr/samples/boards/tlsr9x/pwm_pool/
+        west build -b tlsr9118bdk40d             -d build_pwm_pool                      zephyr/samples/boards/tlsr9x/pwm_pool/        -- -DCONFIG_COMPILER_WARNINGS_AS_ERRORS=y
 
+    - name: Build W91 shell
+      run: |
+        cd ..
+        west build -b tlsr9118bdk40d             -d build_shell                         zephyr/samples/subsys/shell/devmem_load/      -- -DCONFIG_COMPILER_WARNINGS_AS_ERRORS=y
+
+    - name: Build W91 crypto/mbedtls
+      run: |
+        cd ..
+        west build -b tlsr9118bdk40d             -d build_crypto_mbedtls                zephyr/tests/crypto/mbedtls                   -- -DCONFIG_COMPILER_WARNINGS_AS_ERRORS=y -DCONFIG_MBEDTLS_ECP_C=y -DCONFIG_MBEDTLS_ECP_ALL_ENABLED=y
+
+    - name: Build W91 drivers/adc_api
+      run: |
+        cd ..
+        west build -b tlsr9118bdk40d             -d build_adc_api                       zephyr/tests/drivers/adc/adc_api             -- -DCONFIG_COMPILER_WARNINGS_AS_ERRORS=y
 
     - name: Collect artifacts
       run: |
@@ -116,6 +135,7 @@ jobs:
         cp ../build_button_w91/zephyr/zephyr.bin                    telink_build_artifacts/w91_button.bin
         cp ../build_uart_echo_bot_w91/zephyr/zephyr.bin             telink_build_artifacts/w91_uart_echo_bot.bin
         cp ../build_mpu6050_w91/zephyr/zephyr.bin                   telink_build_artifacts/w91_mpu6050.bin
+        cp ../build_spi_flash_at45_w91/zephyr/zephyr.bin            telink_build_artifacts/w91_spi_flash_at45.bin
         cp ../build_nvs_w91/zephyr/zephyr.bin                       telink_build_artifacts/w91_nvs.bin
         cp ../build_mcuboot_w91/zephyr/zephyr.bin                   telink_build_artifacts/w91_mcuboot.bin
         cp ../build_blinky_dfu_w91/zephyr/zephyr.signed.bin         telink_build_artifacts/w91_blinky_dfu.signed.bin
@@ -126,6 +146,9 @@ jobs:
         cp ../build_key_pool/zephyr/zephyr.bin                      telink_build_artifacts/w91_key_pool.bin
         cp ../build_led_pool/zephyr/zephyr.bin                      telink_build_artifacts/w91_led_pool.bin
         cp ../build_pwm_pool/zephyr/zephyr.bin                      telink_build_artifacts/w91_pwm_pool.bin
+        cp ../build_shell/zephyr/zephyr.bin                         telink_build_artifacts/w91_shell.bin
+        cp ../build_crypto_mbedtls/zephyr/zephyr.bin                telink_build_artifacts/w91_mbedtls.bin
+        cp ../build_adc_api/zephyr/zephyr.bin                       telink_build_artifacts/w91_adc_api.bin
         cp ../build_blinky_w91/zephyr/n22.bin                       telink_build_artifacts/n22.bin
 
     - name: Publish artifacts
