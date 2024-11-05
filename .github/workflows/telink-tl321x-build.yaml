@@ -112,7 +112,7 @@ jobs:
     - name: Build TL321X crypto/mbedtls
       run: |
         cd ..
-        west build -b tl3218x     -d build_crypto_mbedtls_tl3218x            zephyr/tests/crypto/mbedtls                    -- -DCONFIG_COMPILER_WARNINGS_AS_ERRORS=y -DCONFIG_MBEDTLS_ECP_C=y -DCONFIG_MBEDTLS_ECP_ALL_ENABLED=y
+        west build -b tl3218x     -d build_crypto_mbedtls_tl321x            zephyr/tests/crypto/mbedtls                    -- -DCONFIG_COMPILER_WARNINGS_AS_ERRORS=y -DCONFIG_MBEDTLS_ECP_C=y -DCONFIG_MBEDTLS_ECP_ALL_ENABLED=y
 
     - name: Collect artifacts
       run: |
