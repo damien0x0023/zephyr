@@ -43,3 +43,20 @@ zephyr_link_libraries(
 	-Wl,--wrap,sys_heap_aligned_alloc
 	-Wl,--wrap,sys_heap_aligned_realloc
 )
+
+# Make MCUBoot LZMA decompression code injection
+if (CONFIG_COMPRESS_LZMA)
+
+zephyr_sources(
+	mcu_boot_lzma.c
+)
+
+zephyr_include_directories(
+	${ZEPHYR_MCUBOOT_MODULE_DIR}/boot/bootutil/src
+)
+
+zephyr_link_libraries(
+	-Wl,--wrap,boot_slots_compatible
+)
+
+endif()
