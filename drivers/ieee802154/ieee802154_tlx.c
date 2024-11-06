@@ -6,9 +6,7 @@
 
 #define DT_DRV_COMPAT telink_tlx_zb
 
-#if CONFIG_SOC_RISCV_TELINK_B91 || CONFIG_SOC_RISCV_TELINK_B92
-#include "rf.h"
-#elif CONFIG_SOC_RISCV_TELINK_B95 || CONFIG_SOC_RISCV_TELINK_TL321X
+#if CONFIG_SOC_RISCV_TELINK_TL721X || CONFIG_SOC_RISCV_TELINK_TL321X
 #include "rf_common.h"
 #endif
 #include "stimer.h"
@@ -1015,7 +1013,7 @@ static int tlx_start(const struct device *dev)
 			DT_INST_IRQ(0, priority));
 #endif /* CONFIG_DYNAMIC_INTERRUPTS */
 		if (!tlx_rf_zigbee_250K_mode) {
-#if CONFIG_SOC_RISCV_TELINK_B95 && CONFIG_IEEE802154_2015
+#if CONFIG_SOC_RISCV_TELINK_TL721X && CONFIG_IEEE802154_2015
 			ske_dig_en();
 #endif
 			rf_mode_init();
@@ -1055,10 +1053,10 @@ static int tlx_stop(const struct device *dev)
 		riscv_plic_irq_disable(DT_INST_IRQN(0) - CONFIG_2ND_LVL_ISR_TBL_OFFSET);
 		rf_set_tx_rx_off();
 #ifdef CONFIG_PM_DEVICE
-#if  CONFIG_SOC_RISCV_TELINK_B91 || CONFIG_SOC_RISCV_TELINK_B92 || CONFIG_SOC_RISCV_TELINK_TL321X
+#if CONFIG_SOC_RISCV_TELINK_TL321X
 		rf_baseband_reset();
 		rf_reset_dma();
-#elif CONFIG_SOC_RISCV_TELINK_B95
+#elif CONFIG_SOC_RISCV_TELINK_TL721X
 		rf_radio_reset();
 #endif
 		tlx_rf_zigbee_250K_mode = false;

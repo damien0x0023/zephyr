@@ -7,40 +7,35 @@ Overview
 ********
 
 The TL3218X Generic Starter Kit is a hardware platform which
-can be used to verify the `Telink TLSR9 series chipset`_ and develop applications
-for several 2.4 GHz air interface standards including Bluetooth 5.2 (Basic data
-rate, Enhanced data rate, LE, Indoor positioning and BLE Mesh),
-Zigbee 3.0, Homekit, 6LoWPAN, Thread and 2.4 Ghz proprietary.
+can be used to verify the Telink TLx series chipset and develop applications
+for several 2.4 GHz air interface standards including Bluetooth LE, Zigbee, RF4CE,
+Thread, Matter, and 2.4GHz proprietary standard.
 
 .. figure:: img/tl3218x.jpg
      :align: center
      :alt: TL3218X
 
-More information about the board can be found at the `Telink B92 Generic Starter Kit Hardware Guide`_ website.
+.. More information about the board can be found at the `Telink B92 Generic Starter Kit Hardware Guide`_ website.
 
 Hardware
 ********
 
-The TL3218X SoC integrates a powerful 32-bit RISC-V MCU, DSP, 2.4 GHz ISM Radio, 512
-KB SRAM (256 KB of Data Local Memory and 256 KB of Instruction Local Memory first 96 KB of this memory
-supports retention feature), external Flash memory, stereo audio codec, 14 bit AUX ADC,
-analog and digital Microphone input, PWM, flexible IO interfaces, and other peripheral blocks required
-for advanced IoT, hearable, and wearable devices.
+The TL3218X SoC integrates a powerful 32-bit RISC-V MCU, DSP, 2.4 GHz ISM Radio, 128 KB SRAM
+including 96 KB retention feature SRAM, external Flash memory, 12-bit AUX ADC, PWM, flexible
+IO interfaces, and other peripheral blocks required for advanced IoTapplications.
 
-.. figure:: img/tl3218_block_diagram.jpg
+.. figure:: img/tl3218_block_diagram.png
      :align: center
      :alt: TL3218X_SOC
 
 The TL3218X default board configuration provides the following hardware components:
 
 - RF conducted antenna
-- 1 MB External SPI Flash memory with reset button. (Possible to mount 1/2/4 MB)
+- 2 MB External SPI Flash memory with reset button. (Possible to mount 1/2/4 MB)
 - Chip reset button
 - Mini USB interface
 - 4-wire JTAG
 - 4 LEDs, Key matrix up to 4 keys
-- 2 line-in function (Dual Analog microphone supported when switching jumper from microphone path)
-- Dual Digital microphone
 - Stereo line-out
 
 Supported Features
@@ -84,7 +79,8 @@ The Zephyr TL3218X board configuration supports the following hardware features:
 | PKE            | on-chip    | mbedtls                      |
 +----------------+------------+------------------------------+
 
-Board supports power-down modes: suspend and deep-sleep. For deep-sleep mode only 96KB of retention memory is available.
+.. Board supports power-down modes: suspend and deep-sleep. For deep-sleep mode only 96KB of retention memory is available.
+
 Board supports HW cryptography acceleration (AES and ECC till 256 bits). MbedTLS interface is used as cryptography front-end.
 
 .. note::
@@ -111,21 +107,18 @@ System Clock
 ------------
 
 The TL3218X board is configured to use the 24 MHz external crystal oscillator
-with the on-chip PLL/DIV generating the 48 MHz system clock.
+with the on-chip PLL/DIV generating the 96 MHz system clock.
 The following values also could be assigned to the system clock in the board DTS file
 (``boards/riscv/tl321x/tl3218x-common.dtsi``):
 
-- 16000000
 - 24000000
-- 32000000
 - 48000000
-- 60000000
 - 96000000
 
 .. code-block::
 
    &cpu0 {
-       clock-frequency = <48000000>;
+       clock-frequency = <96000000>;
    };
 
 PINs Configuration
@@ -134,23 +127,21 @@ PINs Configuration
 The TL3218X SoC has five GPIO controllers (PORT_A to PORT_F), and the next are
 currently enabled:
 
-- LED0 (blue): PD0, LED1 (green): PD1, LED2 (white): PE6, LED3 (red): PE7
-- Key Matrix SW2: PD2_PD6, SW3: PD2_PF6, SW4: PD7_PD6, SW5: PD7_PF6
+- LED0 (white): PD0, LED1 (green): PB0, LED2 (red): PB1, LED3 (blue): PB2
+- Key Matrix SW3: PB3_PB6, SW4: PB3_PB7, SW5: PB5_PB6, SW6: PB5_PB7
 
 Peripheral's pins on the SoC are mapped to the following GPIO pins in the
 ``boards/riscv/tl321x/tl3218x-common.dtsi`` file:
 
-- UART0 TX: PB2, RX: PB3
-- UART1 TX: PC6, RX: PC7
-- PWM Channel 0: PD0
-- LSPI CLK: PE1, MISO: PE3, MOSI: PE2
-- GSPI CLK: PA2, MISO: PA3, MOSI: PA4
-- I2C SCL: PC0, SDA: PC1
+- UART0 TX: PE0, RX: PE1
+- PWM Channel 0: PB2
+- GSPI CLK: PE5, MISO: PE6, MOSI: PE7
+- I2C SCL: PC3, SDA: PC2
 
 Serial Port
 -----------
 
-The TL3218X SoC has 2 UARTs. The Zephyr console output is assigned to UART0.
+The TL3218X SoC has 1 UART. The Zephyr console output is assigned to UART0.
 The default settings are 115200 8N1.
 
 Programming and debugging
@@ -164,7 +155,7 @@ Building
    These instructions assume you've set up a development environment as
    described in the `Zephyr Getting Started Guide`_.
 
-To build applications using the default RISC-V toolchain from Zephyr SDK, just run the west build command.
+To build applications using the default RISC-V toolchain from Zephyr SDK, just run the west build command.
 Here is an example for the "hello_world" application.
 
 .. code-block:: console
@@ -184,7 +175,7 @@ serial port:
 
 .. code-block:: console
 
-   *** Booting Zephyr OS version 2.5.0  ***
+   *** Booting Zephyr OS build zephyr-v3.3.0-xxxx-xxxxxxxxxxxxx  ***
    Hello World! tl3218x
 
 
@@ -195,20 +186,20 @@ To flash the TL3218X board see the sources below:
 
 - `Burning and Debugging Tools for all Series`_
 
-It is also possible to use the west flash command. Download BDT tool for Linux `Burning and Debugging Tools for Linux`_ or
-`Burning and Debugging Tools for Windows`_ and extract archive into some directory you wish TELINK_BDT_BASE_DIR
+.. It is also possible to use the west flash command. Download BDT tool for Linux `Burning and Debugging Tools for Linux`_ or
+.. `Burning and Debugging Tools for Windows`_ and extract archive into some directory you wish TELINK_BDT_BASE_DIR
 
-- Now you should be able to run the west flash command with the BDT path specified (TELINK_BDT_BASE_DIR).
+.. - Now you should be able to run the west flash command with the BDT path specified (TELINK_BDT_BASE_DIR).
 
-.. code-block:: console
+.. .. code-block:: console
 
-   west flash --bdt-path=$TELINK_BDT_BASE_DIR --erase
+..    west flash --bdt-path=$TELINK_BDT_BASE_DIR --erase
 
-- You can also run the west flash command without BDT path specification if TELINK_BDT_BASE_DIR is in your environment (.bashrc).
+.. - You can also run the west flash command without BDT path specification if TELINK_BDT_BASE_DIR is in your environment (.bashrc).
 
-.. code-block:: console
+.. .. code-block:: console
 
-   export TELINK_BDT_BASE_DIR="/opt/telink_bdt/"
+..    export TELINK_BDT_BASE_DIR="/opt/telink_bdt/"
 
 
 References
@@ -216,8 +207,6 @@ References
 
 .. target-notes::
 
-.. _Telink TLSR9 series chipset: https://wiki.telink-semi.cn/wiki/chip-series/TLSR952x-Series/
-.. _Telink B92 Generic Starter Kit Hardware Guide: https://wiki.telink-semi.cn/wiki/Hardware/B92_Generic_Starter_Kit_Hardware_Guide
 .. _Burning and Debugging Tools for all Series: https://wiki.telink-semi.cn/wiki/IDE-and-Tools/Burning-and-Debugging-Tools-for-all-Series/
 .. _Burning and Debugging Tools for Linux: https://wiki.telink-semi.cn/tools_and_sdk/Tools/BDT/Telink_libusb_BDT-Linux-X64-V1.6.0.zip
 .. _Burning and Debugging Tools for Windows: https://wiki.telink-semi.cn/tools_and_sdk/Tools/BDT/BDT.zip
