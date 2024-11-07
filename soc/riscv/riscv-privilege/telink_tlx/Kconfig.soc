@@ -23,12 +23,12 @@ config TELINK_TL321X_PMP
 	help
 		This option enables Telink TL321X PMP(memory protection) module.
 
-config TELINK_B95_PMP
+config TELINK_TL721X_PMP
 	bool "Support Hardware Memory Protection"
-	depends on SOC_RISCV_TELINK_B95
+	depends on SOC_RISCV_TELINK_TL721X
 	select RISCV_PMP
 	help
-		This option enables Telink B95 PMP(memory protection) module.
+		This option enables Telink TL721X PMP(memory protection) module.
 
 config TELINK_TLX_HWDSP
 	bool "Support Hardware DSP"
@@ -88,21 +88,15 @@ config TELINK_SOC_REBOOT_ON_FAULT_DELAY
 	default 1000
 	range 0 30000
 	help
-		This option sets Telink B91 chip reboot on fault delay in mS.
+		This option sets Telink TLX chip reboot on fault delay in mS.
 
-config TELINK_B91_USB_SWI_DISABLE
+config TELINK_TLX_USB_SWI_DISABLE
 	bool "Don't use USB SWI interface"
 	depends on SOC_SERIES_RISCV_TELINK_TLX
 	default n
 	help
 		This option disables USB SWI interface
 
-config TELINK_B9X_2_WIRE_SPI_ENABLE
-	bool "Use 2-wire SPI interface to FLASH"
-	depends on SOC_SERIES_RISCV_TELINK_TLX
-	default n
-	help
-		This option enables 2-wire SPI interface to FLASH
 
 config TELINK_TLX_2_WIRE_SPI_ENABLE
 	bool "Use 2-wire SPI interface to FLASH"

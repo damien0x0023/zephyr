@@ -18,7 +18,7 @@ LOG_MODULE_REGISTER(bt_hci_driver_tlx);
 #define HCI_ACL                 0x02
 #define HCI_EVT                 0x04
 
-#define HCI_BT_B9X_TIMEOUT K_MSEC(2000)
+#define HCI_BT_TLX_TIMEOUT K_MSEC(2000)
 
 static K_SEM_DEFINE(hci_send_sem, 1, 1);
 
@@ -47,7 +47,7 @@ static bool is_hci_event_discardable(const uint8_t *evt_data)
 	}
 }
 
-static struct net_buf *bt_b9x_evt_recv(uint8_t *data, size_t len)
+static struct net_buf *bt_tlx_evt_recv(uint8_t *data, size_t len)
 {
 	bool discardable;
 	struct bt_hci_evt_hdr hdr;
@@ -95,7 +95,7 @@ static struct net_buf *bt_b9x_evt_recv(uint8_t *data, size_t len)
 	return buf;
 }
 
-static struct net_buf *bt_b9x_acl_recv(uint8_t *data, size_t len)
+static struct net_buf *bt_tlx_acl_recv(uint8_t *data, size_t len)
 {
 	struct bt_hci_acl_hdr hdr;
 	struct net_buf *buf;
@@ -136,7 +136,7 @@ static struct net_buf *bt_b9x_acl_recv(uint8_t *data, size_t len)
 	return buf;
 }
 
-static void hci_b9x_host_rcv_pkt(uint8_t *data, uint16_t len)
+static void hci_tlx_host_rcv_pkt(uint8_t *data, uint16_t len)
 {
 	uint8_t pkt_indicator;
 	struct net_buf *buf;
@@ -148,11 +148,11 @@ static void hci_b9x_host_rcv_pkt(uint8_t *data, uint16_t len)
 
 	switch (pkt_indicator) {
 	case HCI_EVT:
-		buf = bt_b9x_evt_recv(data, len);
+		buf = bt_tlx_evt_recv(data, len);
 		break;
 
 	case HCI_ACL:
-		buf = bt_b9x_acl_recv(data, len);
+		buf = bt_tlx_acl_recv(data, len);
 		break;
 
 	default:
@@ -166,17 +166,17 @@ static void hci_b9x_host_rcv_pkt(uint8_t *data, uint16_t len)
 	}
 }
 
-static void hci_b9x_controller_rcv_pkt_ready(void)
+static void hci_tlx_controller_rcv_pkt_ready(void)
 {
 	k_sem_give(&hci_send_sem);
 }
 
-static b9x_bt_host_callback_t vhci_host_cb = {
-	.host_send_available = hci_b9x_controller_rcv_pkt_ready,
-	.host_read_packet = hci_b9x_host_rcv_pkt
+static tlx_bt_host_callback_t vhci_host_cb = {
+	.host_send_available = hci_tlx_controller_rcv_pkt_ready,
+	.host_read_packet = hci_tlx_host_rcv_pkt
 };
 
-static int bt_b9x_send(struct net_buf *buf)
+static int bt_tlx_send(struct net_buf *buf)
 {
 	int err = 0;
 	uint8_t type;
@@ -199,8 +199,8 @@ static int bt_b9x_send(struct net_buf *buf)
 
 	LOG_HEXDUMP_DBG(buf->data, buf->len, "Final HCI buffer:");
 
-	if (k_sem_take(&hci_send_sem, HCI_BT_B9X_TIMEOUT) == 0) {
-		b9x_bt_host_send_packet(type, buf->data, buf->len);
+	if (k_sem_take(&hci_send_sem, HCI_BT_TLX_TIMEOUT) == 0) {
+		tlx_bt_host_send_packet(type, buf->data, buf->len);
 	} else {
 		LOG_ERR("Send packet timeout error");
 		err = -ETIMEDOUT;
@@ -213,7 +213,7 @@ done:
 	return err;
 }
 
-static int hci_b9x_open(void)
+static int hci_tlx_open(void)
 {
 #if CONFIG_IEEE802154_TELINK_TLX
 	extern volatile bool tlx_rf_zigbee_250K_mode;
@@ -222,20 +222,16 @@ static int hci_b9x_open(void)
 #endif
 	int status;
 
-	status = b9x_bt_controller_init();
+	status = tlx_bt_controller_init();
 	if (status) {
 		LOG_ERR("Bluetooth controller init failed %d", status);
 		return status;
 	}
 
-	b9x_bt_host_callback_register(&vhci_host_cb);
+	tlx_bt_host_callback_register(&vhci_host_cb);
 
-#if CONFIG_SOC_RISCV_TELINK_B91
-	LOG_DBG("B91 BT started");
-#elif CONFIG_SOC_RISCV_TELINK_B92
-	LOG_DBG("B92 BT started");
-#elif CONFIG_SOC_RISCV_TELINK_B95
-	LOG_DBG("B95 BT started");
+#if CONFIG_SOC_RISCV_TELINK_TL721X
+	LOG_DBG("TL721X BT started");
 #elif CONFIG_SOC_RISCV_TELINK_TL321X
 	LOG_DBG("TL321X BT started");
 #endif
@@ -243,12 +239,12 @@ static int hci_b9x_open(void)
 	return 0;
 }
 
-static int hci_b9x_close(void)
+static int hci_tlx_close(void)
 {
 #if defined(CONFIG_BT_HCI_HOST) && defined(CONFIG_BT_BROADCASTER)
 	bt_le_adv_stop();
 #endif /* CONFIG_BT_HCI_HOST && CONFIG_BT_BROADCASTER */
-	b9x_bt_controller_deinit();
+	tlx_bt_controller_deinit();
 #if CONFIG_IEEE802154_TELINK_TLX
 	extern volatile bool tlx_rf_zigbee_250K_mode;
 
@@ -258,25 +254,21 @@ static int hci_b9x_close(void)
 }
 
 static const struct bt_hci_driver drv = {
-#if CONFIG_SOC_RISCV_TELINK_B91
-	.name   = "BT B91",
-#elif CONFIG_SOC_RISCV_TELINK_B92
-	.name   = "BT B92",
-#elif CONFIG_SOC_RISCV_TELINK_B95
-	.name   = "BT B95",
+#if CONFIG_SOC_RISCV_TELINK_TL721X
+	.name   = "BT TL721X",
 #elif CONFIG_SOC_RISCV_TELINK_TL321X
 	.name   = "BT TL321X",
 #endif
-	.open   = hci_b9x_open,
-	.close	= hci_b9x_close,
-	.send   = bt_b9x_send,
+	.open   = hci_tlx_open,
+	.close	= hci_tlx_close,
+	.send   = bt_tlx_send,
 	.bus    = BT_HCI_DRIVER_BUS_IPM,
 #if defined(CONFIG_BT_DRIVER_QUIRK_NO_AUTO_DLE)
 	.quirks = BT_QUIRK_NO_AUTO_DLE,
 #endif
 };
 
-static int bt_b9x_init(void)
+static int bt_tlx_init(void)
 {
 
 	bt_hci_driver_register(&drv);
@@ -284,4 +276,4 @@ static int bt_b9x_init(void)
 	return 0;
 }
 
-SYS_INIT(bt_b9x_init, POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEVICE);
+SYS_INIT(bt_tlx_init, POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEVICE);

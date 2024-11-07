@@ -784,9 +784,9 @@ static int gpio_tlx_pm_action(const struct device *dev, enum pm_device_action ac
 	switch (action) {
 	case PM_DEVICE_ACTION_RESUME:
 		{
-			extern volatile bool b9x_deep_sleep_retention;
+			extern volatile bool tlx_deep_sleep_retention;
 
-			if (b9x_deep_sleep_retention) {
+			if (tlx_deep_sleep_retention) {
 				memcpy(gpio, &data->gpio_tlx_retention.gpio_tlx_periph_config,
 				sizeof(data->gpio_tlx_retention.gpio_tlx_periph_config));
 				if (IS_PORT_C(gpio)) {

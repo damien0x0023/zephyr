@@ -1,8 +1,8 @@
 # Copyright (c) 2024 Telink Semiconductor
 # SPDX-License-Identifier: Apache-2.0
 
-if (CONFIG_TELINK_B91_USB_SWI_DISABLE)
-	message(STATUS "B91 USB SWI interface is disabled")
+if (CONFIG_TELINK_TLX_USB_SWI_DISABLE)
+	message(STATUS "TLX USB SWI interface is disabled")
 endif()
 
 if (CONFIG_TELINK_TLX_2_WIRE_SPI_ENABLE)

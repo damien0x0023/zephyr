@@ -7,7 +7,7 @@
 #include <zephyr/logging/log.h>
 #include <zephyr/pm/pm.h>
 #include <stimer.h>
-#include <b9x_sleep.h>
+#include <tlx_sleep.h>
 #include <zephyr/kernel.h>
 
 LOG_MODULE_DECLARE(soc, CONFIG_SOC_LOG_LEVEL);
@@ -29,7 +29,7 @@ LOG_MODULE_DECLARE(soc, CONFIG_SOC_LOG_LEVEL);
 #endif /* CONFIG_BT */
 
 /**
- * @brief This define converts Machine Timer ticks to B9x System Timer ticks.
+ * @brief This define converts Machine Timer ticks to TLx System Timer ticks.
  */
 #define MTIME_TO_STIME_SCALE (SYSTEM_TIMER_TICK_1S / CONFIG_SYS_CLOCK_HW_CYCLES_PER_SEC)
 
@@ -82,7 +82,7 @@ static void set_mtime(uint64_t time)
 }
 
 #if CONFIG_SOC_SERIES_RISCV_TELINK_TLX_RETENTION
-volatile bool b9x_deep_sleep_retention;
+volatile bool tlx_deep_sleep_retention;
 #endif /* CONFIG_SOC_SERIES_RISCV_TELINK_TLX_RETENTION */
 
 /**
@@ -108,7 +108,7 @@ __weak void pm_state_set(enum pm_state state, uint8_t substate_id)
 		if (stimer_sleep_ticks > SYSTICKS_MAX_SLEEP) {
 			stimer_sleep_ticks = SYSTICKS_MAX_SLEEP;
 		}
-		if (b9x_suspend(tl_sleep_tick + stimer_sleep_ticks)) {
+		if (tlx_suspend(tl_sleep_tick + stimer_sleep_ticks)) {
 			current_time +=
 				systicks_to_mticks(stimer_get_tick() - tl_sleep_tick);
 			set_mtime(current_time);
@@ -119,12 +119,12 @@ __weak void pm_state_set(enum pm_state state, uint8_t substate_id)
 		if (stimer_sleep_ticks > SYSTICKS_MAX_SLEEP) {
 			stimer_sleep_ticks = SYSTICKS_MAX_SLEEP;
 		}
-		if (b9x_deep_sleep(tl_sleep_tick + stimer_sleep_ticks)) {
+		if (tlx_deep_sleep(tl_sleep_tick + stimer_sleep_ticks)) {
 			current_time +=
 				systicks_to_mticks(stimer_get_tick() - tl_sleep_tick);
 			set_mtime_compare(wakeup_time);
 			set_mtime(current_time);
-			b9x_deep_sleep_retention = true;
+			tlx_deep_sleep_retention = true;
 		}
 		break;
 #endif /* CONFIG_SOC_SERIES_RISCV_TELINK_TLX_RETENTION */
@@ -144,7 +144,7 @@ __weak void pm_state_exit_post_ops(enum pm_state state, uint8_t substate_id)
 	ARG_UNUSED(substate_id);
 
 #if CONFIG_SOC_SERIES_RISCV_TELINK_TLX_RETENTION
-	b9x_deep_sleep_retention = false;
+	tlx_deep_sleep_retention = false;
 #endif
 
 	/*

@@ -68,7 +68,7 @@ void soc_load_rf_parameters_normal(void)
 		unsigned char cap_freq_ofset;
 
 		flash_read_page(FIXED_PARTITION_OFFSET(vendor_partition) +
-		B9X_CALIBRATION_ADDR_OFFSET, 1, &cap_freq_ofset);
+		TLX_CALIBRATION_ADDR_OFFSET, 1, &cap_freq_ofset);
 		if (cap_freq_ofset != 0xff) {
 			soc_nvParam.cap_freq_offset_en = 1;
 			soc_nvParam.cap_freq_offset_value = cap_freq_ofset;
@@ -93,7 +93,7 @@ void soc_load_rf_parameters_deep_retention(void)
  *
  * @return 0
  */
-static int soc_b9x_init(void)
+static int soc_tlx_init(void)
 {
 	unsigned int cclk = DT_PROP(DT_PATH(cpus, cpu_0), clock_frequency);
 
@@ -151,7 +151,7 @@ void sys_arch_reboot(int type)
 /**
  * @brief Restore SOC after deep-sleep.
  */
-void soc_b9x_restore(void)
+void soc_tlx_restore(void)
 {
 	unsigned int cclk = DT_PROP(DT_PATH(cpus, cpu_0), clock_frequency);
 
@@ -228,7 +228,7 @@ unsigned char flash_set_4line_read_write(unsigned int flash_mid)
 /**
  * @brief Check mounted flash size (should be greater than in .dts).
  */
-static int soc_b9x_check_flash(void)
+static int soc_tlx_check_flash(void)
 {
 	static const size_t dts_flash_size = DT_REG_SIZE(DT_CHOSEN(zephyr_flash));
 	size_t hw_flash_size = 0;
@@ -240,9 +240,9 @@ static int soc_b9x_check_flash(void)
 
 	/* Enable Quad SPI (4x) read and write mode */
 	if (flash_set_4line_read_write(mid) != 1) {
-		printk("Error: Failed to switch flash model 0x%X to quad mode\n", mid);
+		printk("!!! Error: Failed to switch flash model 0x%X to quad mode\n", mid);
 	} else {
-		printk("Flash model 0x%X successfully set to quad mode\n", mid);
+		printk("# Flash model 0x%X successfully set to quad mode\n", mid);
 	}
 
 	switch (hw_flash_cap) {
@@ -281,10 +281,10 @@ static int soc_b9x_check_flash(void)
  */
 __attribute__((noinline)) void telink_bt_blc_mac_init(uint8_t *bt_mac)
 {
-	b9x_bt_blc_mac_init(bt_mac);
+	tlx_bt_blc_mac_init(bt_mac);
 }
 #endif
 
-SYS_INIT(soc_b9x_init, PRE_KERNEL_1, 0);
+SYS_INIT(soc_tlx_init, PRE_KERNEL_1, 0);
 
-SYS_INIT(soc_b9x_check_flash, POST_KERNEL, 0);
+SYS_INIT(soc_tlx_check_flash, POST_KERNEL, 0);
