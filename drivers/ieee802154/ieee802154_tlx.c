@@ -10,7 +10,7 @@
 #include "rf_common.h"
 #endif
 #include "stimer.h"
-#include "tlx_rf_power.h"
+#include "tl_rf_power.h"
 
 #define LOG_MODULE_NAME ieee802154_tlx
 #if defined(CONFIG_IEEE802154_DRIVER_LOG_LEVEL)
@@ -979,17 +979,17 @@ static int tlx_set_txpower(const struct device *dev, int16_t dbm)
 	struct tlx_data *tlx = dev->data;
 
 	/* check for supported Min/Max range */
-	if (dbm < TLX_TX_POWER_MIN) {
-		dbm = TLX_TX_POWER_MIN;
-	} else if (dbm > TLX_TX_POWER_MAX) {
-		dbm = TLX_TX_POWER_MAX;
+	if (dbm < TL_TX_POWER_MIN) {
+		dbm = TL_TX_POWER_MIN;
+	} else if (dbm > TL_TX_POWER_MAX) {
+		dbm = TL_TX_POWER_MAX;
 	}
 
 	if (tlx->current_dbm != dbm) {
 		tlx->current_dbm = dbm;
 		/* set TX power */
 		if (tlx->is_started) {
-			rf_set_power_level(tlx_tx_pwr_lt[dbm - TLX_TX_POWER_MIN]);
+			rf_set_power_level(tl_tx_pwr_lt[dbm - TL_TX_POWER_MIN]);
 		}
 	}
 
@@ -1026,7 +1026,7 @@ static int tlx_start(const struct device *dev)
 			rf_set_chn(TLX_LOGIC_CHANNEL_TO_PHYSICAL(tlx->current_channel));
 		}
 		if (tlx->current_dbm != TLX_TX_PWR_NOT_SET) {
-			rf_set_power_level(tlx_tx_pwr_lt[tlx->current_dbm - TLX_TX_POWER_MIN]);
+			rf_set_power_level(tl_tx_pwr_lt[tlx->current_dbm - TL_TX_POWER_MIN]);
 		}
 		rf_set_irq_mask(FLD_RF_IRQ_RX | FLD_RF_IRQ_TX);
 		riscv_plic_irq_enable(DT_INST_IRQN(0) - CONFIG_2ND_LVL_ISR_TBL_OFFSET);
