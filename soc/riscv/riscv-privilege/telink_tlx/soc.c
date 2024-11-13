@@ -241,8 +241,6 @@ static int soc_tlx_check_flash(void)
 	/* Enable Quad SPI (4x) read and write mode */
 	if (flash_set_4line_read_write(mid) != 1) {
 		printk("!!! Error: Failed to switch flash model 0x%X to quad mode\n", mid);
-	} else {
-		printk("# Flash model 0x%X successfully set to quad mode\n", mid);
 	}
 
 	switch (hw_flash_cap) {

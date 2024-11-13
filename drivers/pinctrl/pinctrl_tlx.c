@@ -6,7 +6,7 @@
 
 #include "analog.h"
 #include <zephyr/drivers/pinctrl.h>
-#if CONFIG_SOC_RISCV_TELINK_B95
+#if CONFIG_SOC_RISCV_TELINK_TL721X
 #include <zephyr/dt-bindings/pinctrl/b95-pinctrl.h>
 #elif CONFIG_SOC_RISCV_TELINK_TL321X
 #include <zephyr/dt-bindings/pinctrl/tl321x-pinctrl.h>
@@ -15,7 +15,7 @@
 
 #define DT_DRV_COMPAT telink_tlx_pinctrl
 
-#if CONFIG_SOC_RISCV_TELINK_B95 || CONFIG_SOC_RISCV_TELINK_TL321X
+#if CONFIG_SOC_RISCV_TELINK_TL721X || CONFIG_SOC_RISCV_TELINK_TL321X
 /**
  *      GPIO Function Enable Register
  *      ADDR                 PINS
@@ -30,7 +30,7 @@
 						((pin >> 8) * 0x10)))
 #endif
 
-#if CONFIG_SOC_RISCV_TELINK_B95 || CONFIG_SOC_RISCV_TELINK_TL321X
+#if CONFIG_SOC_RISCV_TELINK_TL721X || CONFIG_SOC_RISCV_TELINK_TL321X
 /**
  *      Function Multiplexer Register
  *         ADDR              PINS
@@ -187,9 +187,6 @@ static int pinctrl_configure_pin(const pinctrl_soc_pin_t *pinctrl)
 	uint32_t pin = TLX_PINMUX_GET_PIN(*pinctrl);
 	uint8_t pull_up_en_addr = reg_pull_up_en(pin);
 
-	/* disable GPIO function (can be enabled back by GPIO init using GPIO driver) */
-	pinctrl_tlx_gpio_function_disable(pin);
-
 	/* calculate offset and mask for the func and pull values */
 	status = pinctrl_tlx_get_offset(pin, &offset);
 	if (status != 0) {
@@ -199,12 +196,15 @@ static int pinctrl_configure_pin(const pinctrl_soc_pin_t *pinctrl)
 	mask = (uint8_t) ~(BIT(offset) | BIT(offset + 1));
 
 	/* set func value */
-#if CONFIG_SOC_RISCV_TELINK_B95
+#if CONFIG_SOC_RISCV_TELINK_TL721X
 	reg_pin_mux(pin) = (reg_pin_mux(pin) & (~B95_PIN_FUNC_POS)) | (func & B95_PIN_FUNC_POS);
 #elif CONFIG_SOC_RISCV_TELINK_TL321X
 	reg_pin_mux(pin) =
 		(reg_pin_mux(pin) & (~TL321X_PIN_FUNC_POS)) | (func & TL321X_PIN_FUNC_POS);
 #endif
+
+	/* disable GPIO function (can be enabled back by GPIO init using GPIO driver) */
+	pinctrl_tlx_gpio_function_disable(pin);
 
 	/* set pull value */
 	pull = pull << offset;
