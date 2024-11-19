@@ -155,19 +155,25 @@ static int soc_tlx_init(void)
 		break;
 #endif
 
+	case CLK_48MHZ:
+#if CONFIG_SOC_RISCV_TELINK_TL321X
+		PLL_192M_CCLK_48M_HCLK_48M_PCLK_48M_MSPI_48M;
+#elif CONFIG_SOC_RISCV_TELINK_TL721X
+		PLL_240M_CCLK_48M_HCLK_48M_PCLK_48M_MSPI_48M;
+#endif
+		break;
+
 #if CONFIG_SOC_RISCV_TELINK_TL721X
-	case CLK_24MHZ:
-		PLL_192M_CCLK_24M_HCLK_24M_PCLK_24M_MSPI_48M;
+	case CLK_60MHZ:
+		PLL_240M_CCLK_60M_HCLK_60M_PCLK_15M_MSPI_48M;
 		break;
 #endif
 
-	case CLK_48MHZ:
-		PLL_192M_CCLK_48M_HCLK_48M_PCLK_48M_MSPI_48M;
-		break;
-
+#if CONFIG_SOC_RISCV_TELINK_TL321X
 	case CLK_96MHZ:
 		PLL_192M_CCLK_96M_HCLK_48M_PCLK_48M_MSPI_48M;
 		break;
+#endif
 	}
 
 	/* Init Machine Timer source clock: 32 KHz RC */
@@ -210,17 +216,31 @@ void soc_tlx_restore(void)
 
 	/* clocks init: CCLK, HCLK, PCLK */
 	switch (cclk) {
+#if CONFIG_SOC_RISCV_TELINK_TL321X
 	case CLK_24MHZ:
 		PLL_192M_CCLK_24M_HCLK_24M_PCLK_24M_MSPI_48M;
+#endif
 		break;
 
 	case CLK_48MHZ:
+#if CONFIG_SOC_RISCV_TELINK_TL321X
 		PLL_192M_CCLK_48M_HCLK_48M_PCLK_48M_MSPI_48M;
+#elif CONFIG_SOC_RISCV_TELINK_TL721X
+		PLL_240M_CCLK_48M_HCLK_48M_PCLK_48M_MSPI_48M;
+#endif
 		break;
 
+#if CONFIG_SOC_RISCV_TELINK_TL721X
+	case CLK_60MHZ:
+		PLL_240M_CCLK_60M_HCLK_60M_PCLK_15M_MSPI_48M;
+		break;
+#endif
+
+#if CONFIG_SOC_RISCV_TELINK_TL321X
 	case CLK_96MHZ:
 		PLL_192M_CCLK_96M_HCLK_48M_PCLK_48M_MSPI_48M;
 		break;
+#endif
 	}
 }
 
@@ -277,11 +297,19 @@ static int soc_tlx_check_flash(void)
 	flash_capacity_e hw_flash_cap;
 	uint32_t mid;
 
+#if CONFIG_SOC_RISCV_TELINK_TL321X
 	mid = flash_read_mid();
+#elif CONFIG_SOC_RISCV_TELINK_TL721X
+	mid = flash_read_mid_with_device_num(SLAVE0);
+#endif
 	hw_flash_cap = (flash_capacity_e)((mid & FLASH_MID_SIZE_MASK) >> FLASH_MID_SIZE_OFFSET);
 
 	/* Enable Quad SPI (4x) read and write mode */
+#if CONFIG_SOC_RISCV_TELINK_TL321X
 	if (flash_set_4line_read_write(mid) != 1) {
+#elif CONFIG_SOC_RISCV_TELINK_TL721X
+	if (flash_set_4line_read_write(SLAVE0, mid) != 1) {
+#endif
 		printk("!!! Error: Failed to switch flash model 0x%X to quad mode\n", mid);
 	}
 
