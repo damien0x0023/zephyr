@@ -19,20 +19,44 @@
 #include "tlx_bt_flash.h"
 #endif
 
-/* List of supported CCLK frequencies */
-#define CLK_24MHZ                   24000000u
-#define CLK_48MHZ                   48000000u
-#define CLK_96MHZ                   96000000u
+/* Power Mode value */
+#if CONFIG_SOC_RISCV_TELINK_TL321X
+	/* List of supported CCLK frequencies */
+	#define CLK_24MHZ                   24000000u
+	#define CLK_48MHZ                   48000000u
+	#define CLK_96MHZ                   96000000u
+#elif CONFIG_SOC_RISCV_TELINK_TL721X
+	/* List of supported CCLK frequencies */
+	#define CLK_40MHZ                   40000000u
+	#define CLK_48MHZ                   48000000u
+	#define CLK_60MHZ                   60000000u
+	#define CLK_80MHZ                   80000000u
+	#define CLK_120MHZ                  120000000u
+#endif
 
 /* MID register flash size */
 #define FLASH_MID_SIZE_OFFSET       16
 #define FLASH_MID_SIZE_MASK         0x00ff0000
 
 /* Power Mode value */
-#if DT_ENUM_IDX(DT_NODELABEL(power), power_mode) == 0
-	#define POWER_MODE      LDO_1P25_LDO_1P8
-#else
-#error "Wrong value for power-mode parameter"
+#if CONFIG_SOC_RISCV_TELINK_TL321X
+	#if DT_ENUM_IDX(DT_NODELABEL(power), power_mode) == 0
+		#define POWER_MODE      LDO_1P25_LDO_1P8
+	#elif DT_ENUM_IDX(DT_NODELABEL(power), power_mode) == 1
+		#define POWER_MODE      DCDC_1P25_LDO_1P8
+	#else
+		#error "Wrong value for power-mode parameter"
+	#endif
+#elif CONFIG_SOC_RISCV_TELINK_TL721X
+	#if DT_ENUM_IDX(DT_NODELABEL(power), power_mode) == 0
+		#define POWER_MODE      LDO_0P94_LDO_1P8
+	#elif DT_ENUM_IDX(DT_NODELABEL(power), power_mode) == 1
+		#define POWER_MODE      DCDC_0P94_LDO_1P8
+	#elif DT_ENUM_IDX(DT_NODELABEL(power), power_mode) == 2
+		#define POWER_MODE      DCDC_0P94_DCDC_1P8
+	#else
+	#error "Wrong value for power-mode parameter"
+	#endif
 #endif
 
 
@@ -46,10 +70,20 @@
 #endif
 
 /* Check System Clock value. */
-#if ((DT_PROP(DT_PATH(cpus, cpu_0), clock_frequency) != CLK_24MHZ) && \
-	(DT_PROP(DT_PATH(cpus, cpu_0), clock_frequency) != CLK_48MHZ) && \
-	(DT_PROP(DT_PATH(cpus, cpu_0), clock_frequency) != CLK_96MHZ))
-	#error "Invalid clock-frequency. Supported values: 24, 48, 96 MHz"
+#if CONFIG_SOC_RISCV_TELINK_TL321X
+	#if ((DT_PROP(DT_PATH(cpus, cpu_0), clock_frequency) != CLK_24MHZ) && \
+		(DT_PROP(DT_PATH(cpus, cpu_0), clock_frequency) != CLK_48MHZ) && \
+		(DT_PROP(DT_PATH(cpus, cpu_0), clock_frequency) != CLK_96MHZ))
+		#error "Invalid clock-frequency. Supported values: 24, 48, 96 MHz"
+	#endif
+#elif CONFIG_SOC_RISCV_TELINK_TL721X
+	#if ((DT_PROP(DT_PATH(cpus, cpu_0), clock_frequency) != CLK_40MHZ) && \
+		(DT_PROP(DT_PATH(cpus, cpu_0), clock_frequency) != CLK_48MHZ) && \
+		(DT_PROP(DT_PATH(cpus, cpu_0), clock_frequency) != CLK_60MHZ) && \
+		(DT_PROP(DT_PATH(cpus, cpu_0), clock_frequency) != CLK_80MHZ) && \
+		(DT_PROP(DT_PATH(cpus, cpu_0), clock_frequency) != CLK_120MHZ))
+		#error "Invalid clock-frequency. Supported values: 24, 40, 48, 60, 80 and 120 MHz"
+	#endif
 #endif
 
 #if (defined(CONFIG_BT_TLX) || defined(CONFIG_IEEE802154))
@@ -115,9 +149,17 @@ static int soc_tlx_init(void)
 
 	/* clocks init: CCLK, HCLK, PCLK */
 	switch (cclk) {
+#if CONFIG_SOC_RISCV_TELINK_TL321X
 	case CLK_24MHZ:
 		PLL_192M_CCLK_24M_HCLK_24M_PCLK_24M_MSPI_48M;
 		break;
+#endif
+
+#if CONFIG_SOC_RISCV_TELINK_TL721X
+	case CLK_24MHZ:
+		PLL_192M_CCLK_24M_HCLK_24M_PCLK_24M_MSPI_48M;
+		break;
+#endif
 
 	case CLK_48MHZ:
 		PLL_192M_CCLK_48M_HCLK_48M_PCLK_48M_MSPI_48M;
