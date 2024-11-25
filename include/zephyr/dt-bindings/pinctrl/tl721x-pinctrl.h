@@ -154,7 +154,7 @@
 #define TLX_PULL_POS     24
 #define TLX_PULL_MSK     0x3
 #define TLX_FUNC_POS     16
-#define TL721X_FUNC_MSK     0xFF
+#define TL721X_FUNC_MSK  0xFF
 #define TLX_PORT_POS     8
 #define TLX_PORT_MSK     0xFF
 
