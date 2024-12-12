@@ -1,6 +1,7 @@
 name: Coding Guidelines
 
-on: pull_request
+on:
+  pull_request
 
 jobs:
   compliance_job:
