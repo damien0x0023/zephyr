@@ -1029,7 +1029,7 @@ static int tlx_start(const struct device *dev)
 			DT_INST_IRQ(0, priority));
 #endif /* CONFIG_DYNAMIC_INTERRUPTS */
 		if (!tlx_rf_zigbee_250K_mode) {
-#if CONFIG_SOC_RISCV_TELINK_TL721X && CONFIG_IEEE802154_2015
+#if (CONFIG_SOC_RISCV_TELINK_TL721X || CONFIG_SOC_RISCV_TELINK_TL321X) && CONFIG_IEEE802154_2015
 			ske_dig_en();
 #endif
 			rf_mode_init();
