@@ -142,7 +142,6 @@ static int soc_tlx_init(void)
 	pm_set_ret_ldo_voltage(RET_LDO_TRIM_0P65V);
 #endif
 
-
 #if CONFIG_PM
 	gpio_shutdown(GPIO_ALL);
 #endif /* CONFIG_PM */
@@ -173,9 +172,8 @@ static int soc_tlx_init(void)
 		break;
 
 	case CLK_80MHZ:
-		PLL_240M_CCLK_80M_HCLK_40M_PCLK_40M_MSPI_60M;
+		PLL_240M_CCLK_80M_HCLK_40M_PCLK_40M_MSPI_48M;
 		break;
-
 #endif
 
 #if CONFIG_SOC_RISCV_TELINK_TL321X
@@ -188,7 +186,6 @@ static int soc_tlx_init(void)
 	case CLK_120MHZ:
 		PLL_240M_CCLK_120M_HCLK_60M_PCLK_60M_MSPI_60M;
 		break;
-
 	case CLK_240MHZ:
 		PLL_240M_CCLK_240M_HCLK_120M_PCLK_120M_MSPI_60M;
 		break;
@@ -256,7 +253,7 @@ void soc_tlx_restore(void)
 		break;
 
 	case CLK_80MHZ:
-		PLL_240M_CCLK_80M_HCLK_40M_PCLK_40M_MSPI_60M;
+		PLL_240M_CCLK_80M_HCLK_40M_PCLK_40M_MSPI_48M;
 		break;
 #endif
 
@@ -270,7 +267,6 @@ void soc_tlx_restore(void)
 	case CLK_120MHZ:
 		PLL_240M_CCLK_120M_HCLK_60M_PCLK_60M_MSPI_60M;
 		break;
-
 	case CLK_240MHZ:
 		PLL_240M_CCLK_240M_HCLK_120M_PCLK_120M_MSPI_60M;
 		break;
