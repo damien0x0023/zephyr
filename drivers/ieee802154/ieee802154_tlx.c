@@ -826,15 +826,17 @@ static void ALWAYS_INLINE tlx_rf_rx_isr(const struct device *dev)
 	if (status < 0 && pkt != NULL) {
 		net_pkt_unref(pkt);
 	}
+#if CONFIG_SOC_RISCV_TELINK_TL321X
 #if defined CONFIG_IEEE802154_TLX_OPTIMIZATION && CONFIG_IEEE802154_TLX_OPTIMIZATION
 	if (frame.general.fp_bit == true) {
 		dma_chn_en(DMA1);
 	} else {
 		rf_set_tx_rx_off();
 	}
-#else /* !CONFIG_IEEE802154_TLX_OPTIMIZATION */
+#endif /* !CONFIG_IEEE802154_TLX_OPTIMIZATION */
+#else
 		dma_chn_en(DMA1);
-#endif /* CONFIG_IEEE802154_TLX_OPTIMIZATION */
+#endif 
 }
 
 /* TX IRQ handler */
