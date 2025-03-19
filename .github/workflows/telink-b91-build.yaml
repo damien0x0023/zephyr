@@ -1,6 +1,10 @@
 name: Telink B91 build examples
 
-on: pull_request
+on:
+  push:
+    branches:
+      - develop_v3.3_ram_eval
+  pull_request:
 
 jobs:
   telink_build_examples:
@@ -39,6 +43,11 @@ jobs:
         west blobs list hal_telink -f '{status} {path}' | grep '^M lib_zephyr_b91.a$' && exit 1
         west zephyr-export
         pip install -r zephyr/scripts/requirements.txt
+
+    - name: Build B91 hello-world
+      run: |
+        cd ..
+        west build -b tlsr9518adk80d             -d build_hello_b91                    zephyr/samples/hello_world                              -- -DCONFIG_COMPILER_WARNINGS_AS_ERRORS=y
 
     - name: Build B91 basic/blinky
       run: |
@@ -94,6 +103,16 @@ jobs:
       run: |
         cd ..
         west build -b tlsr9518adk80d             -d build_usb_console_b91               zephyr/samples/subsys/usb/console                        -- -DCONFIG_COMPILER_WARNINGS_AS_ERRORS=y
+
+    - name: Build B91 subsys/usb/hid for USB driver
+      run: |
+        cd ..
+        west build -b tlsr9518adk80d             -d build_usb_hid_b91                   zephyr/samples/subsys/usb/hid                        -- -DCONFIG_COMPILER_WARNINGS_AS_ERRORS=y
+
+    - name: Build B91 subsys/usb/console for USB driver
+      run: |
+        cd ..
+        west build -b tlsr9518adk80d             -d build_usb_hid_mouse_b91             zephyr/samples/subsys/usb/hid-mouse                        -- -DCONFIG_COMPILER_WARNINGS_AS_ERRORS=y
 
     - name: Build B91 net/openthread/coprocessor in RCP configuration with USB interface
       run: |
