@@ -150,10 +150,8 @@ static signed short adc_tlx_get_code(void)
 {
 	signed short adc_code;
 
-#if CONFIG_SOC_RISCV_TELINK_TL321X
+#if  CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X
 	adc_code = adc_get_code();
-#elif CONFIG_SOC_RISCV_TELINK_TL721X
-	adc_code = adc_get_raw_code();
 #endif
 	return adc_code;
 }
