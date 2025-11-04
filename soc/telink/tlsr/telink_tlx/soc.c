@@ -298,7 +298,8 @@ void soc_early_init_hook(void)
 	clock_cal_32k_rc();
 
 	/* pke is not enabled by default on TL323X */
-#if CONFIG_SOC_RISCV_TELINK_TL323X	
+#if CONFIG_SOC_RISCV_TELINK_TL323X
+	extern void pke_dig_en(void);
 	pke_dig_en();
 #endif
 
@@ -495,6 +496,7 @@ unsigned char flash_set_4line_read_write(unsigned int flash_mid)
 	return status;
 }
 #endif
+
 
 /**
  * @brief Check mounted flash size (should be greater than in .dts).
