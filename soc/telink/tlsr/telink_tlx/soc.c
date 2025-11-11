@@ -15,6 +15,10 @@
 #include <zephyr/device.h>
 #include <zephyr/storage/flash_map.h>
 
+#if DEBUG_GPIO_ENABLE
+#include "gpio_default.h"
+#endif
+
 #if (defined(CONFIG_BT_TLX) || defined(IEEE802154_TELINK_TLX))
 #include "tlx_bt_flash.h"
 #endif
@@ -428,7 +432,11 @@ void soc_tlx_restore(void)
 		break;
 #endif
 	}
-
+	/* pke is not enabled by default on TL323X */
+#if CONFIG_SOC_RISCV_TELINK_TL323X
+	extern void pke_dig_en(void);
+	pke_dig_en();
+#endif
 	int deepRetWakeUp = pm_is_MCU_deepRetentionWakeup(); //MCU deep retention wakeUp
 #if DEBUG_GPIO_ENABLE
 	gpio_init(!deepRetWakeUp);
@@ -562,3 +570,18 @@ static int soc_tlx_check_flash(void)
 }
 
 SYS_INIT(soc_tlx_check_flash, POST_KERNEL, 0);
+
+#ifdef CONFIG_TELINK_TL322X_ENABLE_N22
+static int soc_tlx_mcc_init(void)
+{
+	extern void mb_irq_handler(void);
+    IRQ_CONNECT(IRQ_MAILBOX_N22_TO_D25 + CONFIG_2ND_LVL_ISR_TBL_OFFSET, 2, mb_irq_handler, 0, 0);
+	volatile uint32_t key = arch_irq_lock();
+    sys_n22_start();
+    mcc_d25f_service_init();
+	arch_irq_unlock(key);
+
+	return 0;
+}
+SYS_INIT(soc_tlx_mcc_init, POST_KERNEL, 1);
+#endif
