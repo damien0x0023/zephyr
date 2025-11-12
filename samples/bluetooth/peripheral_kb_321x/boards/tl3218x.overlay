@@ -1,14 +1,10 @@
 &cpu0 {
-	clock-frequency = <192000000>;		/* USB0 digital voltage must be 1.1V and HCLK min's 48M */
-	/*clock-frequency = <96000000>;*/
+	clock-frequency = <96000000>;
 };
 
 &uart0 {
 	status = "okay";
-	/*alg keyboard*/
-	/*pinctrl-0 = <&uart0_tx_pd4_default &uart0_rx_pd5_default>;*/
-	/*digital keyboard*/
-	pinctrl-0 = <&uart0_tx_pe5_default &uart0_rx_pd7_default>;
+	pinctrl-0 = <&uart0_tx_pa2_default &uart0_rx_pa3_default>;
 	current-speed = <2000000>;			/* Baud rate for serial port logging */
 };
 
@@ -37,12 +33,15 @@
 		/delete-property/ pwm-led0;
 		/delete-property/ pwm0;
 
-		toggle4 = &toggle_b4_pin;
-		toggle5 = &toggle_b5_pin;
+		toggle0 = &toggle_sws_pin;
 
 		vbuscheck0 = &vbus_pin;
-		mode2p4 = &mode_2p4_pin;
-		modeble = &mode_ble_pin;
+		modeswitch = &mode_pin;
+		mosctrl = &mos_ctrl_pin;
+
+		led24g = &p24g_led;
+		ledble = &ble_led;
+		ledbat = &bat_led;
 
 	};
 
@@ -52,28 +51,39 @@
 	leds {
 		compatible = "gpio-leds";
 
-		toggle_b4_pin: toggle_io_4 {
-			gpios = <&gpiob 4 GPIO_ACTIVE_HIGH>;
-			label = "TOGGLE";
-		};
-
-		toggle_b5_pin: toggle_io_5 {
-			gpios = <&gpiob 5 GPIO_ACTIVE_HIGH>;
+		toggle_sws_pin: toggle_io_5 {
+			gpios = <&gpioa 7 GPIO_ACTIVE_HIGH>;
 			label = "TOGGLE";
 		};
 
 		vbus_pin: vbus_io {
-			gpios = <&gpioc 1 (GPIO_ACTIVE_LOW)>;
+			gpios = <&gpiod 6 (GPIO_ACTIVE_LOW)>;
 			label = "VBUS CHECK";
 		};
 
-		mode_2p4_pin: mode_2p4_io {
-			gpios = <&gpioe 3 (GPIO_ACTIVE_LOW)>;
-			label = "MODE 2P4 SLECT";
-		};
-		mode_ble_pin: mode_ble_io {
-			gpios = <&gpioe 4 (GPIO_ACTIVE_LOW)>;
+		mode_pin: mode_io {
+			gpios = <&gpioe 2 (GPIO_ACTIVE_LOW)>;
 			label = "MODE BLE SLECT";
+		};
+
+		mos_ctrl_pin: mos_io {
+			gpios = <&gpioe 0 (GPIO_ACTIVE_LOW)>;
+			label = "MOS CTL SLECT";
+		};
+
+		p24g_led: led_24g_io {
+			gpios = <&gpioa 2 (GPIO_ACTIVE_LOW)>;
+			label = "LED 24G";
+		};
+
+		ble_led: led_ble_io {
+			gpios = <&gpioa 3 (GPIO_ACTIVE_LOW)>;
+			label = "LED BLE";
+		};
+
+		bat_led: led_bat_io {
+			gpios = <&gpioa 0 (GPIO_ACTIVE_LOW)>;
+			label = "LED BAT";
 		};
 	};
 
@@ -82,39 +92,41 @@
 	/delete-node/ led_pool;
 	/delete-node/ pwm_pool;
 
+	/delete-node/ key_matrix;
+
 	key_matrix {
 		compatible = "gpio-keys";
 
 		col {
-			gpios = <&gpioe 6 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>,
-					<&gpioe 7 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>,
-					<&gpioa 0 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>,
-					<&gpioa 1 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>,
-					<&gpioa 2 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>,
-					<&gpioc 6 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>,
-					<&gpioc 7 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>,
-					<&gpiog 0 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>,
-					<&gpiof 7 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>,
-					<&gpiof 6 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>,
-					<&gpiof 5 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>,
-					<&gpiof 4 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>,
-					<&gpiob 1 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>,
-					<&gpiob 0 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>,
+			gpios = <&gpioe 3 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>,
+					<&gpioc 5 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>,
 					<&gpioc 4 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>,
 					<&gpioc 3 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>,
-					<&gpiod 2 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>,
-					<&gpiog 1 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>,
-					<&gpiog 2 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>,
-					<&gpioh 0 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>;
+					<&gpioc 1 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>,
+					<&gpioc 2 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>,
+					<&gpiob 4 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>,
+					<&gpiob 5 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>,
+					<&gpioe 5 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>,
+					<&gpioe 4 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>,
+					<&gpiob 3 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>,
+					<&gpioa 1 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>,
+					<&gpioa 4 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>,
+					<&gpiob 7 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>,
+					<&gpiob 6 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>,
+					<&gpiob 1 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>,
+					<&gpioe 7 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>,
+					<&gpioe 6 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>;
 		};
 
 		row {
-			gpios = <&gpioe 2 GPIO_ACTIVE_HIGH>,
-					<&gpioe 1 GPIO_ACTIVE_HIGH>,
-					<&gpioe 0 GPIO_ACTIVE_HIGH>,
-					<&gpiod 6 GPIO_ACTIVE_HIGH>,
+			gpios = <&gpiod 5 GPIO_ACTIVE_HIGH>,
+					<&gpiob 2 GPIO_ACTIVE_HIGH>,
+					<&gpiod 0 GPIO_ACTIVE_HIGH>,
+					<&gpiod 1 GPIO_ACTIVE_HIGH>,
+					<&gpiod 2 GPIO_ACTIVE_HIGH>,
 					<&gpiod 4 GPIO_ACTIVE_HIGH>,
-					<&gpiod 5 GPIO_ACTIVE_HIGH>;
+					<&gpiod 7 GPIO_ACTIVE_HIGH>,
+					<&gpiod 3 GPIO_ACTIVE_HIGH>;
 		};
 	};
 
@@ -124,7 +136,7 @@
 	};
 };
 
-&adc {
+/*&adc {
 	#address-cells = <1>;
 	#size-cells = <0>;
 
@@ -134,17 +146,18 @@
 		zephyr,reference = "ADC_REF_INTERNAL";
 		zephyr,acquisition-time = <ADC_ACQ_TIME_DEFAULT>;
 		zephyr,resolution = <12>;
-		zephyr,input-positive = <DT_ADC_GPIO_PC0>;
+		zephyr,input-positive = <DT_ADC_GPIO_PB0>;
 	};
 };
 
 &adc {
-	status = "okay";
+	status = "disabled";
 	vref-internal-mv = <1200>;
 	sample-freq = <DT_FREQ_K(96)>;
-	pinctrl-0 = <&adc_pc0_default>;
+	pinctrl-0 = <&adc_pb0_default>;
 	pinctrl-names = "default";
 };
+*/
 
 &flash {
 	reg = <0x20000000 0x100000>;
@@ -212,16 +225,16 @@
 
 	/* UART0: TX(PA0), RX(PA1), RTS(PB4), CTS(PB6) */
 
-	/delete-node/ uart0_tx_pa0_default;
-	/delete-node/ uart0_rx_pa1_default;
+	/delete-node/ uart0_tx_pe0_default;
+	/delete-node/ uart0_rx_pe1_default;
 
-	uart0_tx_pe5_default: uart0_tx_pe5_default {
-		pinmux = <TLX_PINMUX_SET(TLX_PORT_E, TLX_PIN_5,
-			(TL322X_FUNC_UART0_TX))>;
+	uart0_tx_pa2_default: uart0_tx_p2a_default {
+		pinmux = <TLX_PINMUX_SET(TLX_PORT_A, TLX_PIN_2,
+			(TL321X_FUNC_UART0_TX))>;
 	};
-	uart0_rx_pd7_default: uart0_rx_pd7_default {
-		pinmux = <TLX_PINMUX_SET(TLX_PORT_D, TLX_PIN_7,
-			(TL322X_FUNC_UART0_RTX_IO))>;
+	uart0_rx_pa3_default: uart0_rx_p3a_default {
+		pinmux = <TLX_PINMUX_SET(TLX_PORT_A, TLX_PIN_3,
+			(TL321X_FUNC_UART0_RTX_IO))>;
 	};
 };
 
@@ -236,14 +249,6 @@
 &i2c {
 	status = "disabled";
 	clock-frequency = <I2C_BITRATE_FAST>;
-	pinctrl-0 = <&i2c_scl_pe0_default &i2c_sda_pe1_default>;
-	pinctrl-names = "default";
-};
-
-&adc {
-	status = "okay";
-	vref-internal-mv = <1200>;
-	sample-freq = <DT_FREQ_K(96)>;
-	pinctrl-0 = <&adc_pc0_default>;
+	pinctrl-0 = <&i2c_scl_pc3_default &i2c_sda_pc2_default>;
 	pinctrl-names = "default";
 };
