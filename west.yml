@@ -247,13 +247,13 @@ manifest:
       path: modules/hal/tdk
     - name: hal_telink
       url: https://github.com/telink-semi/hal_telink
-      revision: c922edc2e9f172f096ae1dac6fdf5197a0cbc854
+      revision: e6911e81de08886da806d2241cecb74e94978c07
       path: modules/hal/telink
       groups:
         - hal 
     - name: tl_ble_sdk
-      url: https://github.com/telink-semi/tl_ble_sdk.git
-      revision: 20eb59b1003eec87e547eac663a6e0a97b709472
+      url: https://github.com/telink-semi/tl_ble_sdk_zephyr.git
+      revision: 72bbfcc8361b4783db85c09ecaa4e1b2621a39fb
       path: modules/hal/telink/tl_ble_sdk
       groups:
         - hal

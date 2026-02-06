@@ -278,15 +278,15 @@ void soc_early_init_hook(void)
 {
 	unsigned int cclk = DT_PROP(DT_PATH(cpus, cpu_0), clock_frequency);
 
-	/* In bootloader , will force to use 96M to save start time */
-#if CONFIG_SOC_RISCV_TELINK_TL323X && CONFIG_MCUBOOT
-	cclk = CLK_96MHZ;
-#endif
-
 #ifdef CONFIG_PM
 	/* Select internal 32K for BLE PM, ASAP after boot */
 	blc_pm_select_internal_32k_crystal();
 #endif /* CONFIG_PM  */
+
+	/* in non pm mode ,will set ldo to 1.2v to make it work ok */
+#if CONFIG_SOC_RISCV_TELINK_TL323X && !CONFIG_PM
+	cclk = CLK_96MHZ;
+#endif
 
 	/* system init */
 	sys_init(POWER_MODE, VBAT_TYPE, INTERNAL_CAP_XTAL24M);
@@ -297,6 +297,11 @@ void soc_early_init_hook(void)
 	}
 	pm_set_ret_ldo_voltage(RET_LDO_TRIM_0P65V);
 #endif
+
+/* note: only the 3.3uH, need to set this value , user open by yourself. 6.8uH just ignore .*/
+#if CONFIG_SOC_RISCV_TELINK_TL323X && CONFIG_SOC_PMOS_SWITCH_TIME_CTL
+	analog_write_reg8(0x01,(analog_read_reg8(0x01)&0xf8)|0x06);// change from 0x04 to 0x06 for the board changes.
+#endif /*CONFIG_SOC_PMOS_SWITCH_TIME_CTL*/
 
 #if CONFIG_PM
 	gpio_shutdown(GPIO_ALL);
@@ -368,6 +373,7 @@ void soc_early_init_hook(void)
 	// 	break;
 #elif CONFIG_SOC_RISCV_TELINK_TL323X
 	case CLK_96MHZ:
+		pm_set_dig_ldo_voltage(DIG_LDO_TRIM_0P1000V);
 		PLL_192M_CCLK_96M_HCLK_48M_PCLK_48M_MSPI_48M;
 		break;
 #endif
@@ -443,6 +449,11 @@ void soc_tlx_restore(void)
 	/* system init */
 	sys_init(POWER_MODE, VBAT_TYPE, INTERNAL_CAP_XTAL24M);
 
+/* note: only the 3.3uH, need to set this value , user open by yourself. 6.8uH just ignore .*/
+#if CONFIG_SOC_RISCV_TELINK_TL323X && CONFIG_SOC_PMOS_SWITCH_TIME_CTL
+	analog_write_reg8(0x01,(analog_read_reg8(0x01)&0xf8)|0x06);// change from 0x04 to 0x06 for the board changes.
+#endif /*CONFIG_SOC_PMOS_SWITCH_TIME_CTL*/
+
 #if CONFIG_PM
 	gpio_shutdown(GPIO_ALL);
 #endif /* CONFIG_PM */
@@ -516,6 +527,7 @@ void soc_tlx_restore(void)
 	// 	break;
 #elif CONFIG_SOC_RISCV_TELINK_TL323X
 	case CLK_96MHZ:
+		pm_set_dig_ldo_voltage(DIG_LDO_TRIM_0P1000V);
 		PLL_192M_CCLK_96M_HCLK_48M_PCLK_48M_MSPI_48M;
 		break;
 #endif
