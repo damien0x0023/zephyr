@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2023-2026 Telink
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 #include <zephyr/bluetooth/bluetooth.h>
 #include <zephyr/bluetooth/hci.h>
 #include <zephyr/bluetooth/conn.h>

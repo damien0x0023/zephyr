@@ -1,7 +1,7 @@
 /* main.c - OpenThread + BLE Peripheral coexistence demo */
 
 /*
- * Copyright (c) 2023-2024 Telink
+ * Copyright (c) 2023-2026 Telink
  *
  * SPDX-License-Identifier: Apache-2.0
  */
