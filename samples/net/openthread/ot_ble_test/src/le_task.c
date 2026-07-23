@@ -14,10 +14,11 @@ LOG_MODULE_REGISTER(ot_ble_le_task, LOG_LEVEL_INF);
 /* Channel Sounding RAS Reflector integration */
 #define BT_UUID_RAS_SERVICE_VAL 0x185B
 
+#if CONFIG_BT_TLX_CHANNEL_SOUNDING
 extern void cs_reflector_init(void);
 extern void cs_reflector_on_connected(struct bt_conn *conn, uint8_t err);
 extern void cs_reflector_on_disconnected(struct bt_conn *conn);
-
+#endif
 
 /* ============================================================
  * BLE Peripheral section
@@ -41,13 +42,17 @@ static void connected(struct bt_conn *conn, uint8_t err)
 	} else {
 		printk("Connected\n");
 	}
+#if CONFIG_BT_TLX_CHANNEL_SOUNDING
 	cs_reflector_on_connected(conn, err);
+#endif
 }
 
 static void disconnected(struct bt_conn *conn, uint8_t reason)
 {
 	printk("Disconnected, reason 0x%02x %s\n", reason, bt_hci_err_to_str(reason));
+#if CONFIG_BT_TLX_CHANNEL_SOUNDING
 	cs_reflector_on_disconnected(conn);
+#endif
 }
 
 BT_CONN_CB_DEFINE(conn_callbacks) = {
@@ -97,10 +102,10 @@ void bt_le_task_init(void)
 	if (IS_ENABLED(CONFIG_SETTINGS)) {
 		settings_load();
 	}
-
+#if CONFIG_BT_TLX_CHANNEL_SOUNDING
 	/* Initialize Channel Sounding RAS Reflector */
 	cs_reflector_init();
-
+#endif
     bt_ready();
 
 	// bt_conn_auth_cb_register(&auth_cb_display);

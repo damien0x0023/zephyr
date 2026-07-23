@@ -7,4 +7,6 @@ project(ot_cli)
 
 target_sources(app PRIVATE src/main.c)
 target_sources(app PRIVATE src/le_task.c)
-target_sources(app PRIVATE src/cs_reflector.c)
+if(CONFIG_BT_TLX_CHANNEL_SOUNDING)
+    target_sources(app PRIVATE src/cs_reflector.c)
+endif()
