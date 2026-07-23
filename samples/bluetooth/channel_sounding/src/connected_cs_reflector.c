@@ -28,21 +28,21 @@
  */
 
 /* ── RAS Service UUIDs ─────────────────────────────────────────────── */
-#define BT_UUID_RAS_SERVICE_VAL           0x185B
-#define BT_UUID_RAS_FEATURE_VAL           0x2C14
-#define BT_UUID_RAS_REAL_TIME_DATA_VAL    0x2C15
-#define BT_UUID_RAS_ON_DEMAND_DATA_VAL    0x2C16
-#define BT_UUID_RAS_CONTROL_POINT_VAL     0x2C17
-#define BT_UUID_RAS_DATA_READY_VAL        0x2C18
-#define BT_UUID_RAS_DATA_OVERWRITTEN_VAL  0x2C19
+#define BT_UUID_RAS_SERVICE_VAL          0x185B
+#define BT_UUID_RAS_FEATURE_VAL          0x2C14
+#define BT_UUID_RAS_REAL_TIME_DATA_VAL   0x2C15
+#define BT_UUID_RAS_ON_DEMAND_DATA_VAL   0x2C16
+#define BT_UUID_RAS_CONTROL_POINT_VAL    0x2C17
+#define BT_UUID_RAS_DATA_READY_VAL       0x2C18
+#define BT_UUID_RAS_DATA_OVERWRITTEN_VAL 0x2C19
 
-#define BT_UUID_RAS_SERVICE               BT_UUID_DECLARE_16(BT_UUID_RAS_SERVICE_VAL)
-#define BT_UUID_RAS_FEATURE               BT_UUID_DECLARE_16(BT_UUID_RAS_FEATURE_VAL)
-#define BT_UUID_RAS_REAL_TIME_DATA        BT_UUID_DECLARE_16(BT_UUID_RAS_REAL_TIME_DATA_VAL)
-#define BT_UUID_RAS_ON_DEMAND_DATA        BT_UUID_DECLARE_16(BT_UUID_RAS_ON_DEMAND_DATA_VAL)
-#define BT_UUID_RAS_CONTROL_POINT         BT_UUID_DECLARE_16(BT_UUID_RAS_CONTROL_POINT_VAL)
-#define BT_UUID_RAS_DATA_READY            BT_UUID_DECLARE_16(BT_UUID_RAS_DATA_READY_VAL)
-#define BT_UUID_RAS_DATA_OVERWRITTEN      BT_UUID_DECLARE_16(BT_UUID_RAS_DATA_OVERWRITTEN_VAL)
+#define BT_UUID_RAS_SERVICE          BT_UUID_DECLARE_16(BT_UUID_RAS_SERVICE_VAL)
+#define BT_UUID_RAS_FEATURE          BT_UUID_DECLARE_16(BT_UUID_RAS_FEATURE_VAL)
+#define BT_UUID_RAS_REAL_TIME_DATA   BT_UUID_DECLARE_16(BT_UUID_RAS_REAL_TIME_DATA_VAL)
+#define BT_UUID_RAS_ON_DEMAND_DATA   BT_UUID_DECLARE_16(BT_UUID_RAS_ON_DEMAND_DATA_VAL)
+#define BT_UUID_RAS_CONTROL_POINT    BT_UUID_DECLARE_16(BT_UUID_RAS_CONTROL_POINT_VAL)
+#define BT_UUID_RAS_DATA_READY       BT_UUID_DECLARE_16(BT_UUID_RAS_DATA_READY_VAL)
+#define BT_UUID_RAS_DATA_OVERWRITTEN BT_UUID_DECLARE_16(BT_UUID_RAS_DATA_OVERWRITTEN_VAL)
 
 /* ── RAS State ──────────────────────────────────────────────────────── */
 enum {
@@ -68,10 +68,9 @@ enum {
 };
 
 /* RAS feature bitmask (Core Spec v6.0 Vol 3B 7.3) */
-static uint8_t ras_feature =
-	(1 << 0) |	/* realTimeProcedureDataSupport */
-	(1 << 1) |	/* getLostProcedureDataSegmentsSupport */
-	(1 << 2);	/* abortOperationSupport */
+static uint8_t ras_feature = (1 << 0) | /* realTimeProcedureDataSupport */
+			     (1 << 1) | /* getLostProcedureDataSegmentsSupport */
+			     (1 << 2);  /* abortOperationSupport */
 
 /* CCC enable flags */
 static uint16_t ras_realtime_ccc;
@@ -103,17 +102,16 @@ static struct bt_conn *connection;
 #define RAS_SUBEVENT_HEADER_LEN 8
 #define RAS_SEG_HEADER_LEN      1
 
-
 #define RAS_PROCEDURE_MAX_SIZE 2000
 
 #define RAS_PROCEDURE_SLOTS 1
 
 struct ras_procedure_slot {
-	uint8_t  data[RAS_PROCEDURE_MAX_SIZE];
+	uint8_t data[RAS_PROCEDURE_MAX_SIZE];
 	uint16_t len;
 	uint16_t procedure_counter;
-	uint8_t  config_id;
-	bool     in_use;
+	uint8_t config_id;
+	bool in_use;
 };
 
 static struct ras_procedure_slot ras_proc_slots[RAS_PROCEDURE_SLOTS];
@@ -129,8 +127,7 @@ static const char sample_str[] = "CS RAS Reflector";
 
 static const struct bt_data ad[] = {
 	BT_DATA_BYTES(BT_DATA_FLAGS, (BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR)),
-	BT_DATA_BYTES(BT_DATA_UUID16_SOME,
-		      BT_UUID_RAS_SERVICE_VAL & 0xFF,
+	BT_DATA_BYTES(BT_DATA_UUID16_SOME, BT_UUID_RAS_SERVICE_VAL & 0xFF,
 		      (BT_UUID_RAS_SERVICE_VAL >> 8) & 0xFF),
 	BT_DATA(BT_DATA_NAME_COMPLETE, sample_str, sizeof(sample_str) - 1),
 };
@@ -154,9 +151,8 @@ static uint8_t ras_build_seg_header(bool first_seg, bool last_seg, uint8_t seg_i
 }
 
 /* ── RAS helper: build Ranging Header ──────────────────────────────── */
-static void ras_build_ranging_header(uint8_t *buf, uint16_t procedure_counter,
-				     uint8_t config_id, int8_t tx_power,
-				     uint8_t num_antenna_paths)
+static void ras_build_ranging_header(uint8_t *buf, uint16_t procedure_counter, uint8_t config_id,
+				     int8_t tx_power, uint8_t num_antenna_paths)
 {
 	uint16_t word0 = (procedure_counter & 0x0FFF) | ((config_id & 0x0F) << 12);
 
@@ -171,8 +167,7 @@ static void ras_build_ranging_header(uint8_t *buf, uint16_t procedure_counter,
 }
 
 /* ── RAS helper: build Subevent Header ─────────────────────────────── */
-static void ras_build_subevent_header(uint8_t *buf,
-				      struct bt_conn_le_cs_subevent_result *result)
+static void ras_build_subevent_header(uint8_t *buf, struct bt_conn_le_cs_subevent_result *result)
 {
 	buf[0] = (result->header.start_acl_conn_event >> 0) & 0xFF;
 	buf[1] = (result->header.start_acl_conn_event >> 8) & 0xFF;
@@ -192,13 +187,12 @@ static void ras_build_subevent_header(uint8_t *buf,
 }
 
 /* ── RAS helper: convert HCI step data to RAS Subevent Data ─────── */
-static uint16_t ras_convert_step_data(uint8_t *buf,
-				      struct bt_conn_le_cs_subevent_result *result)
+static uint16_t ras_convert_step_data(uint8_t *buf, struct bt_conn_le_cs_subevent_result *result)
 {
 	struct net_buf_simple *sbuf = result->step_data_buf;
 	uint8_t num_steps = result->header.num_steps_reported;
-	bool subevent_aborted = (result->header.subevent_done_status ==
-				 BT_CONN_LE_CS_SUBEVENT_ABORTED);
+	bool subevent_aborted =
+		(result->header.subevent_done_status == BT_CONN_LE_CS_SUBEVENT_ABORTED);
 	uint8_t abort_step = result->header.abort_step;
 	uint8_t *wptr = buf;
 	uint16_t offset = 0;
@@ -235,17 +229,14 @@ static uint16_t ras_convert_step_data(uint8_t *buf,
 
 	return (uint16_t)(wptr - buf);
 }
-static uint16_t ras_build_subevent_data(uint8_t *buf,
-					struct bt_conn_le_cs_subevent_result *result,
+static uint16_t ras_build_subevent_data(uint8_t *buf, struct bt_conn_le_cs_subevent_result *result,
 					bool is_first)
 {
 	uint8_t *wptr = buf;
 
 	if (is_first) {
-		ras_build_ranging_header(wptr,
-					 result->header.procedure_counter,
-					 result->header.config_id,
-					 ras_selected_tx_power,
+		ras_build_ranging_header(wptr, result->header.procedure_counter,
+					 result->header.config_id, ras_selected_tx_power,
 					 result->header.num_antenna_paths);
 		wptr += RAS_RANGING_HEADER_LEN;
 	}
@@ -289,42 +280,37 @@ static void ras_send_work_handler(struct k_work *work)
 		uint16_t remaining = ras_work_len - offset;
 		uint16_t chunk_len = MIN(remaining, max_payload);
 		bool first_seg = (ras_work_is_first && offset == 0);
-		bool last_seg = (ras_work_is_last &&
-				 offset + chunk_len >= ras_work_len);
-		uint8_t seg_hdr = ras_build_seg_header(first_seg, last_seg,
-						       seg_idx);
+		bool last_seg = (ras_work_is_last && offset + chunk_len >= ras_work_len);
+		uint8_t seg_hdr = ras_build_seg_header(first_seg, last_seg, seg_idx);
 		int err;
 
 		ras_chunk_buf[0] = seg_hdr;
 		memcpy(&ras_chunk_buf[1], &ras_work_buf[offset], chunk_len);
 
-		err = bt_gatt_notify(ras_work_conn, ras_work_attr,
-				     ras_chunk_buf, 1 + chunk_len);
+		err = bt_gatt_notify(ras_work_conn, ras_work_attr, ras_chunk_buf, 1 + chunk_len);
 		if (err) {
 			RAS_PRINTK("RAS: chunk fail err=%d seg=%u\n", err, seg_idx);
 			break;
 		}
 
-		RAS_PRINTK("RAS: chunk ok seg=%u first=%d last=%d off=%u len=%u\n",
-		       seg_idx, first_seg, last_seg, offset, chunk_len);
+		RAS_PRINTK("RAS: chunk ok seg=%u first=%d last=%d off=%u len=%u\n", seg_idx,
+			   first_seg, last_seg, offset, chunk_len);
 
 		offset += chunk_len;
 		seg_idx = (seg_idx + 1) & 0x3F;
 	}
 
 	ras_seg_counter = seg_idx;
-	RAS_PRINTK("RAS: send done, total=%u seg_counter=%u\n",
-	       ras_work_len, ras_seg_counter);
+	RAS_PRINTK("RAS: send done, total=%u seg_counter=%u\n", ras_work_len, ras_seg_counter);
 
 	bt_conn_unref(ras_work_conn);
 	ras_work_conn = NULL;
 	ras_sending = false;
 }
 
-static void ras_notify_with_frag(struct bt_conn *conn,
-				 const struct bt_gatt_attr *attr,
-				 const void *data, uint16_t len,
-				 bool is_proc_first, bool is_proc_last)
+static void ras_notify_with_frag(struct bt_conn *conn, const struct bt_gatt_attr *attr,
+				 const void *data, uint16_t len, bool is_proc_first,
+				 bool is_proc_last)
 {
 	if (ras_sending) {
 		RAS_PRINTK("RAS: send busy, dropping data\n");
@@ -332,8 +318,7 @@ static void ras_notify_with_frag(struct bt_conn *conn,
 	}
 
 	if (len > MAX_RAS_DATA_SIZE) {
-		RAS_PRINTK("RAS: data too large %u > %u, truncating\n",
-		       len, MAX_RAS_DATA_SIZE);
+		RAS_PRINTK("RAS: data too large %u > %u, truncating\n", len, MAX_RAS_DATA_SIZE);
 		len = MAX_RAS_DATA_SIZE;
 	}
 
@@ -346,8 +331,8 @@ static void ras_notify_with_frag(struct bt_conn *conn,
 	ras_work_seg_start = ras_seg_counter;
 	ras_sending = true;
 
-	RAS_PRINTK("RAS: submit work %u bytes first=%d last=%d\n",
-	       len, is_proc_first, is_proc_last);
+	RAS_PRINTK("RAS: submit work %u bytes first=%d last=%d\n", len, is_proc_first,
+		   is_proc_last);
 
 	k_work_submit(&ras_send_work);
 }
@@ -355,22 +340,17 @@ static void ras_notify_with_frag(struct bt_conn *conn,
 /* ── CS subevent result ────────────────────────────────────────────── */
 static uint8_t ras_subevent_buf[2000];
 
-static void subevent_result_cb(struct bt_conn *conn,
-			       struct bt_conn_le_cs_subevent_result *result)
+static void subevent_result_cb(struct bt_conn *conn, struct bt_conn_le_cs_subevent_result *result)
 {
 	uint16_t proc_counter = result->header.procedure_counter;
 	uint16_t subevent_len;
 	bool is_first;
 
-	RAS_PRINTK("RAS: subevent proc=%u cfg=%u steps=%u AP=%u done=%u\n",
-	       proc_counter,
-	       result->header.config_id,
-	       result->header.num_steps_reported,
-	       result->header.num_antenna_paths,
-	       result->header.procedure_done_status);
+	RAS_PRINTK("RAS: subevent proc=%u cfg=%u steps=%u AP=%u done=%u\n", proc_counter,
+		   result->header.config_id, result->header.num_steps_reported,
+		   result->header.num_antenna_paths, result->header.procedure_done_status);
 
-	if (!ras_first_subevent ||
-	    proc_counter != ras_current_procedure_counter) {
+	if (!ras_first_subevent || proc_counter != ras_current_procedure_counter) {
 		ras_current_procedure_counter = proc_counter;
 		ras_first_subevent = true;
 		ras_seg_counter = 0;
@@ -414,49 +394,39 @@ static void subevent_result_cb(struct bt_conn *conn,
 
 	if (ras_realtime_ccc & BT_GATT_CCC_NOTIFY) {
 		bool is_proc_last =
-			(result->header.procedure_done_status ==
-			 BT_CONN_LE_CS_PROCEDURE_COMPLETE);
+			(result->header.procedure_done_status == BT_CONN_LE_CS_PROCEDURE_COMPLETE);
 
-		ras_notify_with_frag(conn,
-				     &ras_attrs[RAS_IDX_RT_DATA_VAL],
-				     ras_subevent_buf,
-				     subevent_len,
-				     is_first,
-				     is_proc_last);
+		ras_notify_with_frag(conn, &ras_attrs[RAS_IDX_RT_DATA_VAL], ras_subevent_buf,
+				     subevent_len, is_first, is_proc_last);
 	}
 
 	latest_procedure_counter = proc_counter;
 
 	if (result->header.procedure_done_status == BT_CONN_LE_CS_PROCEDURE_COMPLETE) {
-		RAS_PRINTK("RAS: procedure %u complete, %u bytes in slot %d\n",
-		       proc_counter,
-		       ras_proc_slots[ras_current_slot].len,
-		       ras_current_slot);
+		RAS_PRINTK("RAS: procedure %u complete, %u bytes in slot %d\n", proc_counter,
+			   ras_proc_slots[ras_current_slot].len, ras_current_slot);
 
 		if (ras_dataready_ccc & BT_GATT_CCC_NOTIFY) {
 			uint8_t dr_data[2];
 
 			sys_put_le16(latest_procedure_counter & 0x0FFF, dr_data);
-			bt_gatt_notify(conn,
-				       &ras_attrs[RAS_IDX_DR_VAL],
-				       dr_data, sizeof(dr_data));
+			bt_gatt_notify(conn, &ras_attrs[RAS_IDX_DR_VAL], dr_data, sizeof(dr_data));
 			RAS_PRINTK("RAS: notified Data Ready procedure=%u\n",
-			       latest_procedure_counter);
+				   latest_procedure_counter);
 		}
 		k_sem_give(&sem_procedure_done);
 	}
 }
 
 /* ── RAS GATT callbacks ─────────────────────────────────────────────── */
-static ssize_t ras_gatt_read(struct bt_conn *conn, const struct bt_gatt_attr *attr,
-			     void *buf, uint16_t len, uint16_t offset)
+static ssize_t ras_gatt_read(struct bt_conn *conn, const struct bt_gatt_attr *attr, void *buf,
+			     uint16_t len, uint16_t offset)
 {
 	if (attr == &ras_attrs[RAS_IDX_FEATURE_VAL]) {
-		return bt_gatt_attr_read(conn, attr, buf, len, offset,
-					 &ras_feature, sizeof(ras_feature));
+		return bt_gatt_attr_read(conn, attr, buf, len, offset, &ras_feature,
+					 sizeof(ras_feature));
 	}
-	RAS_PRINTK("RAS GATT read: handle 0x%x len=%u offset=%u\n",
-	       attr->handle, len, offset);
+	RAS_PRINTK("RAS GATT read: handle 0x%x len=%u offset=%u\n", attr->handle, len, offset);
 	return 0;
 }
 
@@ -477,10 +447,8 @@ static void ras_gatt_ccc_cfg_changed(const struct bt_gatt_attr *attr, uint16_t v
 	}
 }
 
-static ssize_t ras_gatt_cp_write(struct bt_conn *conn,
-				 const struct bt_gatt_attr *attr,
-				 const void *buf, uint16_t len,
-				 uint16_t offset, uint8_t flags)
+static ssize_t ras_gatt_cp_write(struct bt_conn *conn, const struct bt_gatt_attr *attr,
+				 const void *buf, uint16_t len, uint16_t offset, uint8_t flags)
 {
 	const uint8_t *data = buf;
 	uint8_t opcode = data[0];
@@ -529,45 +497,29 @@ static ssize_t ras_gatt_cp_write(struct bt_conn *conn,
 static struct bt_gatt_attr ras_attrs[] = {
 	BT_GATT_PRIMARY_SERVICE(BT_UUID_RAS_SERVICE),
 
-	BT_GATT_CHARACTERISTIC(BT_UUID_RAS_FEATURE,
-			       BT_GATT_CHRC_READ,
-			       BT_GATT_PERM_READ,
+	BT_GATT_CHARACTERISTIC(BT_UUID_RAS_FEATURE, BT_GATT_CHRC_READ, BT_GATT_PERM_READ,
 			       ras_gatt_read, NULL, NULL),
 
-	BT_GATT_CHARACTERISTIC(BT_UUID_RAS_REAL_TIME_DATA,
-			       BT_GATT_CHRC_READ | BT_GATT_CHRC_NOTIFY,
-			       BT_GATT_PERM_READ,
-			       ras_gatt_read, NULL, NULL),
-	BT_GATT_CCC(ras_gatt_ccc_cfg_changed,
-		    BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),
+	BT_GATT_CHARACTERISTIC(BT_UUID_RAS_REAL_TIME_DATA, BT_GATT_CHRC_READ | BT_GATT_CHRC_NOTIFY,
+			       BT_GATT_PERM_READ, ras_gatt_read, NULL, NULL),
+	BT_GATT_CCC(ras_gatt_ccc_cfg_changed, BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),
 
-	BT_GATT_CHARACTERISTIC(BT_UUID_RAS_ON_DEMAND_DATA,
-			       BT_GATT_CHRC_READ | BT_GATT_CHRC_NOTIFY,
-			       BT_GATT_PERM_READ,
-			       ras_gatt_read, NULL, NULL),
-	BT_GATT_CCC(ras_gatt_ccc_cfg_changed,
-		    BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),
+	BT_GATT_CHARACTERISTIC(BT_UUID_RAS_ON_DEMAND_DATA, BT_GATT_CHRC_READ | BT_GATT_CHRC_NOTIFY,
+			       BT_GATT_PERM_READ, ras_gatt_read, NULL, NULL),
+	BT_GATT_CCC(ras_gatt_ccc_cfg_changed, BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),
 
 	BT_GATT_CHARACTERISTIC(BT_UUID_RAS_CONTROL_POINT,
-			       BT_GATT_CHRC_WRITE | BT_GATT_CHRC_INDICATE,
-			       BT_GATT_PERM_WRITE,
-			       NULL, ras_gatt_cp_write, NULL),
-	BT_GATT_CCC(ras_gatt_ccc_cfg_changed,
-		    BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),
+			       BT_GATT_CHRC_WRITE | BT_GATT_CHRC_INDICATE, BT_GATT_PERM_WRITE, NULL,
+			       ras_gatt_cp_write, NULL),
+	BT_GATT_CCC(ras_gatt_ccc_cfg_changed, BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),
 
-	BT_GATT_CHARACTERISTIC(BT_UUID_RAS_DATA_READY,
-			       BT_GATT_CHRC_READ | BT_GATT_CHRC_NOTIFY,
-			       BT_GATT_PERM_READ,
-			       ras_gatt_read, NULL, NULL),
-	BT_GATT_CCC(ras_gatt_ccc_cfg_changed,
-		    BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),
+	BT_GATT_CHARACTERISTIC(BT_UUID_RAS_DATA_READY, BT_GATT_CHRC_READ | BT_GATT_CHRC_NOTIFY,
+			       BT_GATT_PERM_READ, ras_gatt_read, NULL, NULL),
+	BT_GATT_CCC(ras_gatt_ccc_cfg_changed, BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),
 
-	BT_GATT_CHARACTERISTIC(BT_UUID_RAS_DATA_OVERWRITTEN,
-			       BT_GATT_CHRC_NOTIFY,
-			       BT_GATT_PERM_NONE,
+	BT_GATT_CHARACTERISTIC(BT_UUID_RAS_DATA_OVERWRITTEN, BT_GATT_CHRC_NOTIFY, BT_GATT_PERM_NONE,
 			       NULL, NULL, NULL),
-	BT_GATT_CCC(ras_gatt_ccc_cfg_changed,
-		    BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),
+	BT_GATT_CCC(ras_gatt_ccc_cfg_changed, BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),
 };
 
 static struct bt_gatt_service ras_service = BT_GATT_SERVICE(ras_attrs);
@@ -576,8 +528,7 @@ static struct bt_gatt_service ras_service = BT_GATT_SERVICE(ras_attrs);
 static void mtu_exchange_cb(struct bt_conn *conn, uint8_t err,
 			    struct bt_gatt_exchange_params *params)
 {
-	printk("MTU exchange %s (%u)\n", err == 0U ? "success" : "failed",
-	       bt_gatt_get_mtu(conn));
+	printk("MTU exchange %s (%u)\n", err == 0U ? "success" : "failed", bt_gatt_get_mtu(conn));
 }
 
 static void mtu_updated(struct bt_conn *conn, uint16_t tx, uint16_t rx)
@@ -635,8 +586,7 @@ static void disconnected_cb(struct bt_conn *conn, uint8_t reason)
 	connection = NULL;
 }
 
-static void remote_capabilities_cb(struct bt_conn *conn,
-				   struct bt_conn_le_cs_capabilities *params)
+static void remote_capabilities_cb(struct bt_conn *conn, struct bt_conn_le_cs_capabilities *params)
 {
 	ARG_UNUSED(params);
 	printk("CS capability exchange completed.\n");
@@ -649,8 +599,7 @@ static void config_created_cb(struct bt_conn *conn, struct bt_conn_le_cs_config 
 	k_sem_give(&sem_config_created);
 }
 
-static void security_changed_cb(struct bt_conn *conn, bt_security_t level,
-				 enum bt_security_err err)
+static void security_changed_cb(struct bt_conn *conn, bt_security_t level, enum bt_security_err err)
 {
 	if (err) {
 		printk("Security failed: level %u err %d\n", level, err);
@@ -679,8 +628,7 @@ static void procedure_enabled_cb(struct bt_conn *conn,
 				 struct bt_conn_le_cs_procedure_enable_complete *params)
 {
 	printk("CS procedures %s, selected_tx_power=%d dBm\n",
-	       params->state ? "enabled" : "disabled",
-	       params->selected_tx_power);
+	       params->state ? "enabled" : "disabled", params->selected_tx_power);
 
 	if (params->selected_tx_power != 0x7F) {
 		ras_selected_tx_power = params->selected_tx_power;
@@ -720,7 +668,7 @@ int main(void)
 		return 0;
 	}
 
-	// Load bonded keys from flash so reconnects skip re-pairing.
+	/* Load bonded keys from flash so reconnects skip re-pairing. */
 	if (IS_ENABLED(CONFIG_SETTINGS)) {
 		settings_load();
 	}
@@ -737,9 +685,8 @@ int main(void)
 	}
 	RAS_PRINTK("RAS service registered (Zephyr GATT)\n");
 
-	err = bt_le_adv_start(BT_LE_ADV_PARAM(BT_LE_ADV_OPT_CONN,
-					       BT_GAP_ADV_FAST_INT_MIN_1,
-					       BT_GAP_ADV_FAST_INT_MAX_1, NULL),
+	err = bt_le_adv_start(BT_LE_ADV_PARAM(BT_LE_ADV_OPT_CONN, BT_GAP_ADV_FAST_INT_MIN_1,
+					      BT_GAP_ADV_FAST_INT_MAX_1, NULL),
 			      ad, ARRAY_SIZE(ad), NULL, 0);
 	if (err) {
 		printk("Advertising failed to start (err %d)\n", err);

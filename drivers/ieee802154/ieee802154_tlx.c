@@ -58,12 +58,12 @@ static const struct device *flash_device = DEVICE_DT_GET(DT_CHOSEN(zephyr_flash_
 #include "debug_gpio.h"
 K_SEM_DEFINE(ieee802154_task_ready_sem, 0, 1);
 /* define 802.15.4 TX sending status type */
-#define TLX_RF_ZIGBEE_TX_IS_IDLE	0
-#define TLX_RF_ZIGBEE_TX_IS_SENDING	1
-#define TLX_RF_ZIGBEE_TX_IS_STOPPED	2
+#define TLX_RF_ZIGBEE_TX_IS_IDLE    0
+#define TLX_RF_ZIGBEE_TX_IS_SENDING 1
+#define TLX_RF_ZIGBEE_TX_IS_STOPPED 2
 /* FIX 802.15.4 TX sending issue */
 static volatile uint8_t tlx_rf_zigbee_tx_is_sending;
-extern bool tlksdk_thd_checkIsInsertTask1(void);    //todo: need to be changed
+extern bool tlksdk_thd_checkIsInsertTask1(void); /* todo: need to be changed */
 extern uint32_t tlksdk_thd_getInsertTask1PostTick(void);
 #endif /*CONFIG_IEEE802154_TLX_BLE_COEXIST*/
 
@@ -898,7 +898,7 @@ ALWAYS_INLINE static void tlx_rf_tx_isr(const struct device *dev)
 #endif
 	/* clear irq status */
 	rf_clr_irq_status(FLD_RF_IRQ_TX);
-	
+
 #ifdef CONFIG_IEEE802154_TLX_BLE_COEXIST
 	/* clear 802.15.4 tx sending flag */
 	tlx_rf_zigbee_tx_is_sending = TLX_RF_ZIGBEE_TX_IS_IDLE;
@@ -1007,7 +1007,7 @@ ALWAYS_INLINE static int tlx_start_radio(struct tlx_data *tlx)
 	/* check if RF is already started */
 	if (!tlx->is_started) {
 		/* whether the Bluetooth stack task is IDLE:  0:  idle,  1:  busy */
-		if(!tlksdk_thd_checkIsInsertTask1()){
+		if (!tlksdk_thd_checkIsInsertTask1()) {
 			LOG_ERR("tlx ble busy");
 			k_sem_take(&ieee802154_task_ready_sem, K_FOREVER);
 			LOG_ERR("tlx ieee802154 task ready sem");
@@ -1179,7 +1179,7 @@ static int tlx_init(const struct device *dev)
 	/* init IRQs */
 #ifndef CONFIG_DYNAMIC_INTERRUPTS
 	IRQ_CONNECT(DT_INST_IRQN(0), DT_INST_IRQ(0, priority), tlx_rf_isr, DEVICE_DT_INST_GET(0),
-			0);
+		    0);
 #endif /* not CONFIG_DYNAMIC_INTERRUPTS */
 #endif /* CONFIG_IEEE802154_TLX_BLE_COEXIST */
 
@@ -1340,13 +1340,11 @@ __GENERIC_SECTION(.ram_code) void stimer_rf_handler(const void *param)
 #endif
 
 #ifdef CONFIG_IEEE802154_TLX_BLE_COEXIST
-_attribute_ram_code_
-void tlx_rf_tx_is_sending(void)
+_attribute_ram_code_ void tlx_rf_tx_is_sending(void)
 {
 	const struct device *dev = DEVICE_DT_INST_GET(0);
 	struct tlx_data *tlx = dev->data;
-	if (tlx_rf_zigbee_tx_is_sending == TLX_RF_ZIGBEE_TX_IS_SENDING)
-	{
+	if (tlx_rf_zigbee_tx_is_sending == TLX_RF_ZIGBEE_TX_IS_SENDING) {
 		tlx_rf_zigbee_tx_is_sending = TLX_RF_ZIGBEE_TX_IS_STOPPED;
 		/* release tx semaphore */
 		k_sem_give(&tlx->tx_wait);
@@ -1374,8 +1372,8 @@ static int tlx_stop(const struct device *dev)
 RAM_CODE_SECTION_IEEE802154
 static void tlx_wfi_direct(uint32_t time_ms)
 {
-	irq_connect_dynamic(IRQ_SYSTIMER + CONFIG_2ND_LVL_ISR_TBL_OFFSET, 2,
-			    stimer_rf_handler, 0, 0);
+	irq_connect_dynamic(IRQ_SYSTIMER + CONFIG_2ND_LVL_ISR_TBL_OFFSET, 2, stimer_rf_handler, 0,
+			    0);
 	plic_set_priority(IRQ_SYSTIMER, 2);
 	plic_interrupt_disable(IRQ_SYSTIMER);
 	stimer_set_irq_capture(stimer_get_tick() + time_ms * SYSTEM_TIMER_TICK_1US);
@@ -1622,20 +1620,23 @@ static int tlx_tx(const struct device *dev, enum ieee802154_tx_mode mode, struct
 	/* lock interrupts */
 	r = irq_lock();
 	bool rf_zigbee_tx_is_stopped = tlx_rf_zigbee_tx_is_sending == TLX_RF_ZIGBEE_TX_IS_STOPPED;
-	uint32_t ScanPostTick = tlksdk_thd_checkIsInsertTask1() ? tlksdk_thd_getInsertTask1PostTick()|1 : 0;    //todo: api should be updated
+	uint32_t ScanPostTick = tlksdk_thd_checkIsInsertTask1()
+					? tlksdk_thd_getInsertTask1PostTick() | 1
+					: 0; /* todo: api should be updated */
 	/* unlock interrupts */
 	irq_unlock(r);
 
 	/* whether the Bluetooth stack task is IDLE:  0:  idle,  1:  busy */
-	if (ScanPostTick && (unsigned int)(ScanPostTick - stimer_get_tick()) < 5 * SYSTEM_TIMER_TICK_1MS) {
-		k_sleep(K_MSEC(1+(unsigned int)(ScanPostTick - stimer_get_tick())/SYSTEM_TIMER_TICK_1MS));
+	if (ScanPostTick &&
+	    (unsigned int)(ScanPostTick - stimer_get_tick()) < 5 * SYSTEM_TIMER_TICK_1MS) {
+		k_sleep(K_MSEC(1 + (unsigned int)(ScanPostTick - stimer_get_tick()) /
+					   SYSTEM_TIMER_TICK_1MS));
 	}
 
-	if(status || rf_zigbee_tx_is_stopped) {
+	if (status || rf_zigbee_tx_is_stopped) {
 		/* skip 802.15.4 RF TX operation */
 		status = -EIO;
-	}
-	else
+	} else
 #endif
 	{
 		/* prepare tx buffer */
@@ -1653,7 +1654,8 @@ static int tlx_tx(const struct device *dev, enum ieee802154_tx_mode mode, struct
 
 #if defined(CONFIG_NET_PKT_TIMESTAMP) && defined(CONFIG_NET_PKT_TXTIME)
 		if (mode == IEEE802154_TX_MODE_TXTIME_CCA) {
-			k_sleep(K_TIMEOUT_ABS_TICKS(k_ns_to_ticks_near64(net_pkt_timestamp_ns(pkt))));
+			k_sleep(K_TIMEOUT_ABS_TICKS(
+				k_ns_to_ticks_near64(net_pkt_timestamp_ns(pkt))));
 		} else
 #endif /* CONFIG_NET_PKT_TIMESTAMP && CONFIG_NET_PKT_TXTIME */
 		{
@@ -1682,7 +1684,7 @@ static int tlx_tx(const struct device *dev, enum ieee802154_tx_mode mode, struct
 		status = -EIO;
 	} else {
 		if ((frag->data[0] & IEEE802154_FRAME_FCF_ACK_REQ_MASK) ==
-        IEEE802154_FRAME_FCF_ACK_REQ_ON) {
+		    IEEE802154_FRAME_FCF_ACK_REQ_ON) {
 			tlx->ack_sn = frag->data[IEEE802154_FRAME_LENGTH_FCF];
 			tlx->ack_handler_en = true;
 		}
@@ -1690,7 +1692,8 @@ static int tlx_tx(const struct device *dev, enum ieee802154_tx_mode mode, struct
 		{
 			/* lock interrupts */
 			r = irq_lock();
-			rf_zigbee_tx_is_stopped = tlx_rf_zigbee_tx_is_sending == TLX_RF_ZIGBEE_TX_IS_STOPPED;
+			rf_zigbee_tx_is_stopped =
+				tlx_rf_zigbee_tx_is_sending == TLX_RF_ZIGBEE_TX_IS_STOPPED;
 			/* unlock interrupts */
 			irq_unlock(r);
 

@@ -1,4 +1,3 @@
-
 #include <zephyr/bluetooth/bluetooth.h>
 #include <zephyr/bluetooth/hci.h>
 #include <zephyr/bluetooth/conn.h>
@@ -26,8 +25,7 @@ extern void cs_reflector_on_disconnected(struct bt_conn *conn);
 
 static const struct bt_data ad[] = {
 	BT_DATA_BYTES(BT_DATA_FLAGS, (BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR)),
-	BT_DATA_BYTES(BT_DATA_UUID16_SOME,
-		      BT_UUID_RAS_SERVICE_VAL & 0xFF,
+	BT_DATA_BYTES(BT_DATA_UUID16_SOME, BT_UUID_RAS_SERVICE_VAL & 0xFF,
 		      (BT_UUID_RAS_SERVICE_VAL >> 8) & 0xFF),
 };
 
@@ -75,18 +73,20 @@ static void bt_ready(void)
 	printk("Advertising successfully started\n");
 }
 
-// static void auth_cancel(struct bt_conn *conn)
-// {
-// 	char addr[BT_ADDR_LE_STR_LEN];
-
-// 	bt_addr_le_to_str(bt_conn_get_dst(conn), addr, sizeof(addr));
-
-// 	printk("Pairing cancelled: %s\n", addr);
-// }
-
-// static struct bt_conn_auth_cb auth_cb_display = {
-// 	.cancel = auth_cancel,
-// };
+/*
+* static void auth_cancel(struct bt_conn *conn)
+* {
+*	char addr[BT_ADDR_LE_STR_LEN];
+*
+*	bt_addr_le_to_str(bt_conn_get_dst(conn), addr, sizeof(addr));
+*
+*	printk("Pairing cancelled: %s\n", addr);
+* }
+*
+* static struct bt_conn_auth_cb auth_cb_display = {
+*	.cancel = auth_cancel,
+* };
+*/
 
 void bt_le_task_init(void)
 {
@@ -106,17 +106,17 @@ void bt_le_task_init(void)
 	/* Initialize Channel Sounding RAS Reflector */
 	cs_reflector_init();
 #endif
-    bt_ready();
+	bt_ready();
 
-	// bt_conn_auth_cb_register(&auth_cb_display);
+	/* bt_conn_auth_cb_register(&auth_cb_display); */
 
 	while (1) {
 		k_sleep(K_SECONDS(1));
 		static int i = 0;
-		
-		if(i == 0){
+
+		if (i == 0) {
 			i = 1;
-			// tlksdk_thd_enableFlexibleTask(THD_TASK_ENABLE);
+			/* tlksdk_thd_enableFlexibleTask(THD_TASK_ENABLE); */
 			tlksdk_thd_enableInsertTask1(0x01);
 		}
 	}
