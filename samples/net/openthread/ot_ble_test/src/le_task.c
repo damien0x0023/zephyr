@@ -9,6 +9,8 @@
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(ot_ble_le_task, LOG_LEVEL_INF);
 
+#include "thd_task.h"
+
 /* Channel Sounding RAS Reflector integration */
 #define BT_UUID_RAS_SERVICE_VAL 0x185B
 
@@ -68,18 +70,18 @@ static void bt_ready(void)
 	printk("Advertising successfully started\n");
 }
 
-static void auth_cancel(struct bt_conn *conn)
-{
-	char addr[BT_ADDR_LE_STR_LEN];
+// static void auth_cancel(struct bt_conn *conn)
+// {
+// 	char addr[BT_ADDR_LE_STR_LEN];
 
-	bt_addr_le_to_str(bt_conn_get_dst(conn), addr, sizeof(addr));
+// 	bt_addr_le_to_str(bt_conn_get_dst(conn), addr, sizeof(addr));
 
-	printk("Pairing cancelled: %s\n", addr);
-}
+// 	printk("Pairing cancelled: %s\n", addr);
+// }
 
-static struct bt_conn_auth_cb auth_cb_display = {
-	.cancel = auth_cancel,
-};
+// static struct bt_conn_auth_cb auth_cb_display = {
+// 	.cancel = auth_cancel,
+// };
 
 void bt_le_task_init(void)
 {

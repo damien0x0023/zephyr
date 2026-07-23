@@ -1409,10 +1409,10 @@ static int tlx_tx(const struct device *dev, enum ieee802154_tx_mode mode, struct
 
 #ifdef CONFIG_IEEE802154_TLX_BLE_COEXIST
 	/* lock interrupts */
-	unsigned int key = irq_lock();
+	unsigned int r = irq_lock();
 	tlx_rf_zigbee_tx_is_sending = TLX_RF_ZIGBEE_TX_IS_SENDING;
 	/* unlock interrupts */
-	irq_unlock(key);
+	irq_unlock(r);
 #endif /* CONFIG_IEEE802154_TLX_BLE_COEXIST */
 
 #if !defined(CONFIG_OPENTHREAD_THREAD_VERSION_1_1)
@@ -1620,11 +1620,11 @@ static int tlx_tx(const struct device *dev, enum ieee802154_tx_mode mode, struct
 
 #ifdef CONFIG_IEEE802154_TLX_BLE_COEXIST
 	/* lock interrupts */
-	key = irq_lock();
+	r = irq_lock();
 	bool rf_zigbee_tx_is_stopped = tlx_rf_zigbee_tx_is_sending == TLX_RF_ZIGBEE_TX_IS_STOPPED;
 	uint32_t ScanPostTick = tlksdk_thd_checkIsInsertTask1() ? tlksdk_thd_getInsertTask1PostTick()|1 : 0;    //todo: api should be updated
 	/* unlock interrupts */
-	irq_unlock(key);
+	irq_unlock(r);
 
 	/* whether the Bluetooth stack task is IDLE:  0:  idle,  1:  busy */
 	if (ScanPostTick && (unsigned int)(ScanPostTick - stimer_get_tick()) < 5 * SYSTEM_TIMER_TICK_1MS) {
@@ -1689,10 +1689,10 @@ static int tlx_tx(const struct device *dev, enum ieee802154_tx_mode mode, struct
 #ifdef CONFIG_IEEE802154_TLX_BLE_COEXIST
 		{
 			/* lock interrupts */
-			key = irq_lock();
-			bool rf_zigbee_tx_is_stopped = tlx_rf_zigbee_tx_is_sending == TLX_RF_ZIGBEE_TX_IS_STOPPED;
+			r = irq_lock();
+			rf_zigbee_tx_is_stopped = tlx_rf_zigbee_tx_is_sending == TLX_RF_ZIGBEE_TX_IS_STOPPED;
 			/* unlock interrupts */
-			irq_unlock(key);
+			irq_unlock(r);
 
 			if (rf_zigbee_tx_is_stopped) {
 				rf_set_rxmode();
@@ -1701,10 +1701,10 @@ static int tlx_tx(const struct device *dev, enum ieee802154_tx_mode mode, struct
 		}
 
 		/* lock interrupts */
-		key = irq_lock();
+		r = irq_lock();
 		tlx_rf_zigbee_tx_is_sending = TLX_RF_ZIGBEE_TX_IS_IDLE;
 		/* unlock interrupts */
-		irq_unlock(key);
+		irq_unlock(r);
 #endif
 	}
 
