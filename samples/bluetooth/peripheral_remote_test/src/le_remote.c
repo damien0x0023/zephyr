@@ -1,5 +1,9 @@
 /* le_remote.c - HID Service implementation for peripheral_remote_test
  *
+ * Copyright (c) 2024 Telink Semiconductor
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ *
  * Equivalent to Telink SDK ble_remote/app_att.c HID Service (L595-648).
  *
  * SPDX-License-Identifier: Apache-2.0
@@ -476,13 +480,13 @@ int hids_notify_cc_in(uint16_t usage)
 
 static void on_button_change(size_t button, bool pressed, void *context)
 {
-	// const char *context_name = "isr";
+	/* const char *context_name = "isr"; */
 
-	// if (!k_is_in_isr()) {
-	// 	context_name = k_thread_name_get(k_current_get());
-	// }
-	// printk("[%s] button %u %s '%s'\n",
-	// 	context_name, button, pressed ? "pressed" : "released", (const char *)context);
+	/* if (!k_is_in_isr()) { */
+	/* context_name = k_thread_name_get(k_current_get()); */
+	/* } */
+	/* printk("[%s] button %u %s '%s'\n", */
+	/* context_name, button, pressed ? "pressed" : "released", (const char *)context); */
 
 	/* HID Consumer Control report semantics:
 	 *   Press   -> send usage code (OS holds the key, repeats the action)

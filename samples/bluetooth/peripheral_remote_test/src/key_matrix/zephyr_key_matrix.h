@@ -44,34 +44,36 @@ struct key_matrix_data {
  *     };
  * };
  */
-#define KEY_MATRIX_DEFINE(name)                                                                    \
-	struct key_matrix_data name = {                                                            \
-		.col = (const struct gpio_dt_spec[]){COND_CODE_1(                                                         \
-			 DT_NODE_HAS_PROP(DT_PATH_INTERNAL(DT_CHILD(name, col)), gpios),     \
-			(DT_FOREACH_PROP_ELEM_SEP(DT_PATH_INTERNAL(DT_CHILD(name, col)),     \
-				gpios, GPIO_DT_SPEC_GET_BY_IDX, (,))),                           \
-			()) },                                           \
-			.col_len = COND_CODE_1(                                                  \
-			 DT_NODE_HAS_PROP(DT_PATH_INTERNAL(DT_CHILD(name, col)), gpios),     \
-			(DT_PROP_LEN(DT_PATH_INTERNAL(DT_CHILD(name, col)), gpios)),         \
-			(0)),    \
-				 .row = (const struct gpio_dt_spec                                 \
-						 []){COND_CODE_1(                                                         \
-			 DT_NODE_HAS_PROP(DT_PATH_INTERNAL(DT_CHILD(name, row)), gpios),     \
-			(DT_FOREACH_PROP_ELEM_SEP(DT_PATH_INTERNAL(DT_CHILD(name, row)),     \
-				gpios, GPIO_DT_SPEC_GET_BY_IDX, (,))),                           \
-			()) },                          \
-					 .row_len = COND_CODE_1(                                                  \
-			 DT_NODE_HAS_PROP(DT_PATH_INTERNAL(DT_CHILD(name, row)), gpios),     \
-			(DT_PROP_LEN(DT_PATH_INTERNAL(DT_CHILD(name, row)), gpios)),         \
-			(0)),                                            \
-						  .buttons = (uint8_t[COND_CODE_1(UTIL_AND(                               \
-			 DT_NODE_HAS_PROP(DT_PATH_INTERNAL(DT_CHILD(name, col)), gpios),     \
-			 DT_NODE_HAS_PROP(DT_PATH_INTERNAL(DT_CHILD(name, row)), gpios)),    \
-			(DIV_ROUND_UP(                                                       \
-				DT_PROP_LEN(DT_PATH_INTERNAL(DT_CHILD(name, col)), gpios) *      \
-				DT_PROP_LEN(DT_PATH_INTERNAL(DT_CHILD(name, row)), gpios), 8)),  \
-			(0))]){},                        \
+#define KEY_MATRIX_COL_NODE(name) DT_PATH_INTERNAL(DT_CHILD(name, col))
+#define KEY_MATRIX_ROW_NODE(name) DT_PATH_INTERNAL(DT_CHILD(name, row))
+
+#define KEY_MATRIX_DEFINE(name) \
+	struct key_matrix_data name = { \
+		.col = (const struct gpio_dt_spec[]){ COND_CODE_1( \
+				DT_NODE_HAS_PROP(KEY_MATRIX_COL_NODE(name), gpios), \
+				(DT_FOREACH_PROP_ELEM_SEP(KEY_MATRIX_COL_NODE(name), \
+					gpios, GPIO_DT_SPEC_GET_BY_IDX, (,))), \
+				()) }, \
+			.col_len = COND_CODE_1( \
+				DT_NODE_HAS_PROP(KEY_MATRIX_COL_NODE(name), gpios), \
+				(DT_PROP_LEN(KEY_MATRIX_COL_NODE(name), gpios)), \
+				(0)), \
+			 .row = (const struct gpio_dt_spec[]){COND_CODE_1( \
+				DT_NODE_HAS_PROP(KEY_MATRIX_ROW_NODE(name), gpios), \
+				(DT_FOREACH_PROP_ELEM_SEP(KEY_MATRIX_ROW_NODE(name), \
+					gpios, GPIO_DT_SPEC_GET_BY_IDX, (,))), \
+				()) }, \
+			 .row_len = COND_CODE_1( \
+				DT_NODE_HAS_PROP(KEY_MATRIX_ROW_NODE(name), gpios), \
+				(DT_PROP_LEN(KEY_MATRIX_ROW_NODE(name), gpios)), \
+				(0)), \
+			 .buttons = (uint8_t[COND_CODE_1(UTIL_AND( \
+				DT_NODE_HAS_PROP(KEY_MATRIX_COL_NODE(name), gpios), \
+				DT_NODE_HAS_PROP(KEY_MATRIX_ROW_NODE(name), gpios)), \
+			(DIV_ROUND_UP( \
+				DT_PROP_LEN(KEY_MATRIX_COL_NODE(name), gpios) * \
+				DT_PROP_LEN(KEY_MATRIX_ROW_NODE(name), gpios), 8)), \
+			(0))]){}, \
 	}
 
 /* Public APIs */
