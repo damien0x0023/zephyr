@@ -34,6 +34,11 @@ LOG_MODULE_DECLARE(soc, CONFIG_SOC_LOG_LEVEL);
  */
 #define MTIME_TO_STIME_SCALE (SYSTEM_TIMER_TICK_1S / CONFIG_SYS_CLOCK_HW_CYCLES_PER_SEC)
 
+/* Debug counters: verify that the PM path is actually entered. */
+volatile unsigned int dbg_pm_state_set_count;
+volatile unsigned int dbg_pm_state_last;
+volatile unsigned int dbg_pm_exit_count;
+
 /**
  * @brief Get Machine Timer Compare value.
  */
@@ -98,6 +103,9 @@ void pm_state_set(enum pm_state state, uint8_t substate_id)
 {
 	ARG_UNUSED(substate_id);
 
+	dbg_pm_state_set_count++;
+	dbg_pm_state_last = (unsigned int)state;
+
 	uint32_t tl_sleep_tick = stimer_get_tick();
 	uint64_t current_time = get_mtime();
 	uint64_t wakeup_time = get_mtime_compare();
@@ -155,6 +163,8 @@ void pm_state_exit_post_ops(enum pm_state state, uint8_t substate_id)
 {
 	ARG_UNUSED(state);
 	ARG_UNUSED(substate_id);
+
+	dbg_pm_exit_count++;
 
 #if CONFIG_SOC_SERIES_RISCV_TELINK_TLX_RETENTION
 	if (tlx_resumed_from_deep_sleep_retention) {

@@ -177,6 +177,24 @@ __attribute__((optimize("O2"))) void gen_fsk_close_unused_clock(void)
 #endif
 #endif
 
+/*
+ * Debug: capture analog register ANA18 (PA7/SWS pull configuration) before
+ * and after the pull-up is applied. boot_* is taken in
+ * soc_early_init_hook() (cold boot); wake_* is taken in soc_tlx_restore()
+ * (deep-retention wake). Both live in retained RAM so the application can
+ * print them after wake.
+ */
+volatile unsigned char ana18_boot_before = 0xEE;
+volatile unsigned char ana18_boot_after = 0xEE;
+volatile unsigned char ana18_wake_before = 0xEE;
+volatile unsigned char ana18_wake_after = 0xEE;
+volatile unsigned int ana18_wake_count;
+
+/* A/B test switch: when 1, soc_tlx_restore() skips the PA7 pull-up
+ * configuration; the application presets the register before sleeping.
+ */
+volatile unsigned int dbg_skip_sws_restore;
+
 /**
  * @brief Perform basic initialization at boot.
  *
@@ -218,7 +236,9 @@ void soc_early_init_hook(void)
 
 	gpio_shutdown(GPIO_ALL);
 
+	ana18_boot_before = analog_read_reg8(0x18);
 	gpio_set_up_down_res(GPIO_SWS, GPIO_PIN_PULLUP_1M);
+	ana18_boot_after = analog_read_reg8(0x18);
 
 #if CONFIG_ADC_TELINK_TL323X
 	g_adc_calib_flag = efuse_calib_sd_adc_vref();
@@ -307,7 +327,12 @@ void soc_tlx_restore(void)
 
 	gpio_shutdown(GPIO_ALL);
 
-	gpio_set_up_down_res(GPIO_SWS, GPIO_PIN_PULLUP_1M);
+	ana18_wake_before = analog_read_reg8(0x18);
+	if (!dbg_skip_sws_restore) {
+		gpio_set_up_down_res(GPIO_SWS, GPIO_PIN_PULLUP_1M);
+	}
+	ana18_wake_after = analog_read_reg8(0x18);
+	ana18_wake_count++;
 
 #if CONFIG_ADC_TELINK_TL323X
 	if (g_adc_calib_flag == DRV_API_SUCCESS) {
