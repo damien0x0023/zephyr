@@ -258,9 +258,8 @@ manifest:
       groups:
         - optional
     - name: hal_telink
-      remote: telink-semi
-      repo-path: hal_telink
-      revision: 3cc9054edd5edcaa1a8b5870099af81433afaf58
+      url: https://github.com/damien0x0023/hal_telink
+      revision: ba81cf09f36a2bbab8d16348cfccfb4ee50f0077
       path: modules/hal/telink
       groups:
         - hal
