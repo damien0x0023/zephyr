@@ -215,7 +215,9 @@ void soc_b9x_restore(void)
 
 	gpio_shutdown(GPIO_ALL);
 
-	gpio_set_up_down_res(GPIO_SWS, GPIO_PIN_PULLUP_1M);
+	/* The SWS pull configuration is retained across sleep; the boot-time
+	 * setting in soc_early_init_hook() is still in effect here.
+	 */
 
 #if (defined(CONFIG_BT_B9X) || defined(CONFIG_IEEE802154))
 	soc_load_rf_parameters_deep_retention();

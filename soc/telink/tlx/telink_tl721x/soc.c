@@ -255,7 +255,9 @@ void soc_tlx_restore(void)
 
 	gpio_shutdown(GPIO_ALL);
 
-	gpio_set_up_down_res(GPIO_SWS, GPIO_PIN_PULLUP_1M);
+	/* The SWS pull configuration is retained across sleep; the boot-time
+	 * setting in soc_early_init_hook() is still in effect here.
+	 */
 
 #if CONFIG_PM
 	cclk = CLK_48MHZ;
